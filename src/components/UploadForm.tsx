@@ -57,6 +57,7 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
         caption,
         category,
         createdAt: creationDate,
+        likes: 0,
       }));
       addPhotos(newPhotos);
       setIsUploading(false);
