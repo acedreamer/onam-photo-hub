@@ -3,7 +3,6 @@ import { useGalleryStore, type Photo } from "@/stores/galleryStore";
 import PhotoCard from "@/components/PhotoCard";
 import PhotoDetail from "@/components/PhotoDetail";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { GalleryVerticalEnd } from "lucide-react";
 
 const Gallery = () => {
   const photos = useGalleryStore((state) => state.photos);
@@ -15,10 +14,15 @@ const Gallery = () => {
         <h1 className="text-4xl font-bold text-leaf-green mb-8 text-center">Community Gallery</h1>
         
         {photos.length === 0 ? (
-          <div className="text-center text-gray-500 mt-24 flex flex-col items-center">
-            <GalleryVerticalEnd className="h-20 w-20 mb-6 text-gray-400" />
-            <p className="text-xl">The gallery is empty.</p>
-            <p className="text-gray-600">Be the first to share a moment!</p>
+          <div className="text-center text-gray-500 mt-16 flex flex-col items-center">
+            <img 
+              src="/pookalam.svg" 
+              alt="Pookalam illustration" 
+              className="w-full max-w-xs sm:max-w-sm mx-auto mb-8"
+              onError={(e) => { e.currentTarget.src = '/placeholder.svg'; e.currentTarget.onerror = null; }}
+            />
+            <h2 className="text-2xl font-semibold text-gray-700">The Gallery Awaits!</h2>
+            <p className="text-gray-600 mt-2">Be the first to share a vibrant Onam moment.</p>
           </div>
         ) : (
           <div className="columns-2 sm:columns-3 gap-4 space-y-4">
