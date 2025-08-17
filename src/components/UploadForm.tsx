@@ -50,11 +50,13 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
     setIsUploading(true);
     
     setTimeout(() => {
-      const newPhotos = files.map(file => ({
-        id: `${new Date().toISOString()}-${file.name}`,
+      const creationDate = new Date().toISOString();
+      const newPhotos = files.map((file, index) => ({
+        id: `${creationDate}-${index}-${file.name}`,
         src: URL.createObjectURL(file),
         caption,
         category,
+        createdAt: creationDate,
       }));
       addPhotos(newPhotos);
       setIsUploading(false);

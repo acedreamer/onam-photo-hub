@@ -29,7 +29,7 @@ const PhotoDetail = ({ photo }: PhotoDetailProps) => {
         <div className="flex items-center space-x-2">
           <Calendar className="h-5 w-5 text-gray-500" />
           <span className="text-sm text-gray-600">
-            {format(new Date(photo.id), "MMMM d, yyyy 'at' h:mm a")}
+            {format(new Date(photo.createdAt), "MMMM d, yyyy 'at' h:mm a")}
           </span>
         </div>
       </div>

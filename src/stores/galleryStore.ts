@@ -5,6 +5,7 @@ export type Photo = {
   src: string;
   caption: string;
   category: string;
+  createdAt: string;
 };
 
 type GalleryState = {
