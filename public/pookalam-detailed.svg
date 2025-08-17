@@ -1,0 +1,34 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="0.5">
+  <g transform="translate(50,50)">
+    {/* 8 large outer petals */}
+    <g>
+      <path d="M0,-48 C 15,-35 15,-15 0,-10 C -15,-15 -15,-35 0,-48 Z" transform="rotate(0)"/>
+      <path d="M0,-48 C 15,-35 15,-15 0,-10 C -15,-15 -15,-35 0,-48 Z" transform="rotate(45)"/>
+      <path d="M0,-48 C 15,-35 15,-15 0,-10 C -15,-15 -15,-35 0,-48 Z" transform="rotate(90)"/>
+      <path d="M0,-48 C 15,-35 15,-15 0,-10 C -15,-15 -15,-35 0,-48 Z" transform="rotate(135)"/>
+      <path d="M0,-48 C 15,-35 15,-15 0,-10 C -15,-15 -15,-35 0,-48 Z" transform="rotate(180)"/>
+      <path d="M0,-48 C 15,-35 15,-15 0,-10 C -15,-15 -15,-35 0,-48 Z" transform="rotate(225)"/>
+      <path d="M0,-48 C 15,-35 15,-15 0,-10 C -15,-15 -15,-35 0,-48 Z" transform="rotate(270)"/>
+      <path d="M0,-48 C 15,-35 15,-15 0,-10 C -15,-15 -15,-35 0,-48 Z" transform="rotate(315)"/>
+    </g>
+
+    {/* 8 medium inner petals */}
+    <g transform="scale(0.7) rotate(22.5)">
+      <path d="M0,-48 C 15,-35 15,-15 0,-10 C -15,-15 -15,-35 0,-48 Z" transform="rotate(0)"/>
+      <path d="M0,-48 C 15,-35 15,-15 0,-10 C -15,-15 -15,-35 0,-48 Z" transform="rotate(45)"/>
+      <path d="M0,-48 C 15,-35 15,-15 0,-10 C -15,-15 -15,-35 0,-48 Z" transform="rotate(90)"/>
+      <path d="M0,-48 C 15,-35 15,-15 0,-10 C -15,-15 -15,-35 0,-48 Z" transform="rotate(135)"/>
+      <path d="M0,-48 C 15,-35 15,-15 0,-10 C -15,-15 -15,-35 0,-48 Z" transform="rotate(180)"/>
+      <path d="M0,-48 C 15,-35 15,-15 0,-10 C -15,-15 -15,-35 0,-48 Z" transform="rotate(225)"/>
+      <path d="M0,-48 C 15,-35 15,-15 0,-10 C -15,-15 -15,-35 0,-48 Z" transform="rotate(270)"/>
+      <path d="M0,-48 C 15,-35 15,-15 0,-10 C -15,-15 -15,-35 0,-48 Z" transform="rotate(315)"/>
+    </g>
+
+    {/* Central circles */}
+    <circle cx="0" cy="0" r="49"/>
+    <circle cx="0" cy="0" r="35"/>
+    <circle cx="0" cy="0" r="24"/>
+    <circle cx="0" cy="0" r="10"/>
+    <circle cx="0" cy="0" r="5" fill="currentColor"/>
+  </g>
+</svg>

@@ -9,9 +9,9 @@ const Home = () => {
       </div>
       <div className="my-8 max-w-xs sm:max-w-sm mx-auto">
         <img 
-          src="/pookalam.svg" 
+          src="/pookalam-detailed.svg" 
           alt="Onam Pookalam" 
-          className="w-full h-auto animate-spin-slow"
+          className="w-full h-auto animate-spin-slow text-neutral-gray"
           onError={(e) => { e.currentTarget.src = '/placeholder.svg'; e.currentTarget.onerror = null; }}
         />
       </div>
