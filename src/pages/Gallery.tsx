@@ -15,11 +15,11 @@ const Gallery = () => {
         
         {photos.length === 0 ? (
           <div className="text-center text-neutral-gray mt-16 flex flex-col items-center">
-            <div className="w-full max-w-xs sm:max-w-sm mx-auto mb-8 p-4">
+            <div className="w-full max-w-xs sm:max-w-sm mx-auto mb-8">
               <img 
                 src="/pookalam.svg" 
                 alt="Pookalam illustration" 
-                className="w-full h-auto"
+                className="w-full h-auto animate-spin-slow"
                 onError={(e) => { e.currentTarget.src = '/placeholder.svg'; e.currentTarget.onerror = null; }}
               />
             </div>

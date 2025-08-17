@@ -7,11 +7,11 @@ const Home = () => {
           Capture and share the vibrant moments of your Onam celebration.
         </p>
       </div>
-      <div className="my-8 max-w-xs sm:max-w-sm mx-auto p-4">
+      <div className="my-8 max-w-xs sm:max-w-sm mx-auto">
         <img 
           src="/pookalam.svg" 
           alt="Onam Pookalam" 
-          className="w-full h-auto"
+          className="w-full h-auto animate-spin-slow"
           onError={(e) => { e.currentTarget.src = '/placeholder.svg'; e.currentTarget.onerror = null; }}
         />
       </div>
