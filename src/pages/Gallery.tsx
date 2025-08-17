@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useGalleryStore, type Photo } from "@/stores/galleryStore";
 import PhotoCard from "@/components/PhotoCard";
 import PhotoDetail from "@/components/PhotoDetail";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { GalleryVerticalEnd } from "lucide-react";
 
 const Gallery = () => {
@@ -33,7 +33,17 @@ const Gallery = () => {
 
       <Dialog open={!!selectedPhoto} onOpenChange={(isOpen) => !isOpen && setSelectedPhoto(null)}>
         <DialogContent className="max-w-4xl bg-ivory">
-          {selectedPhoto && <PhotoDetail photo={selectedPhoto} />}
+          {selectedPhoto && (
+            <>
+              <DialogHeader className="sr-only">
+                <DialogTitle>Photo Details: {selectedPhoto.category}</DialogTitle>
+                <DialogDescription>
+                  {selectedPhoto.caption || `An Onam celebration photo in the ${selectedPhoto.category} category.`}
+                </DialogDescription>
+              </DialogHeader>
+              <PhotoDetail photo={selectedPhoto} />
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </>
