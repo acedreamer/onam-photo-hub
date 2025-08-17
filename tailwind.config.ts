@@ -20,7 +20,9 @@ export default {
     extend: {
       colors: {
         'kasavu-gold': '#D4AF37',
+        'bright-gold': '#FFD700',
         'leaf-green': '#228B22',
+        'dark-leaf-green': '#006400',
         'ivory': '#FFFFF0',
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
