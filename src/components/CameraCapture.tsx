@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Camera, X } from 'lucide-react';
 import { showError } from '@/utils/toast';
@@ -11,15 +11,15 @@ interface CameraCaptureProps {
 const CameraCapture = ({ onCapture, onClose }: CameraCaptureProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [stream, setStream] = useState<MediaStream | null>(null);
 
   useEffect(() => {
+    let mediaStream: MediaStream | null = null;
     const getCameraStream = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: 'environment' },
         });
-        setStream(stream);
+        mediaStream = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
@@ -33,9 +33,11 @@ const CameraCapture = ({ onCapture, onClose }: CameraCaptureProps) => {
     getCameraStream();
 
     return () => {
-      stream?.getTracks().forEach((track) => track.stop());
+      if (mediaStream) {
+        mediaStream.getTracks().forEach((track) => track.stop());
+      }
     };
-  }, [onClose, stream]);
+  }, [onClose]);
 
   const handleCapture = () => {
     if (videoRef.current && canvasRef.current) {
