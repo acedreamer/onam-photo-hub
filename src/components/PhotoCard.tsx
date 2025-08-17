@@ -21,7 +21,7 @@ const PhotoCard = ({ photo }: PhotoCardProps) => {
       </CardContent>
       {photo.caption && (
         <CardFooter className="p-4">
-          <p className="text-sm text-gray-700 line-clamp-2">{photo.caption}</p>
+          <p className="text-sm text-neutral-gray line-clamp-2">{photo.caption}</p>
         </CardFooter>
       )}
     </Card>

@@ -19,16 +19,16 @@ const PhotoDetail = ({ photo }: PhotoDetailProps) => {
       </div>
       <div className="md:w-1/3 flex flex-col space-y-4 pt-4">
         <div>
-          <h3 className="text-xl font-bold text-leaf-green mb-2">Details</h3>
-          <p className="text-gray-700">{photo.caption}</p>
+          <h3 className="text-xl font-bold text-dark-leaf-green mb-2">Details</h3>
+          <p className="text-neutral-gray">{photo.caption}</p>
         </div>
         <div className="flex items-center space-x-2">
           <Tag className="h-5 w-5 text-gray-500" />
-          <Badge variant="secondary" className="bg-leaf-green/20 text-leaf-green">{photo.category}</Badge>
+          <Badge variant="secondary" className="bg-dark-leaf-green/20 text-dark-leaf-green">{photo.category}</Badge>
         </div>
         <div className="flex items-center space-x-2">
           <Calendar className="h-5 w-5 text-gray-500" />
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-neutral-gray">
             {format(new Date(photo.createdAt), "MMMM d, yyyy 'at' h:mm a")}
           </span>
         </div>

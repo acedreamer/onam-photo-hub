@@ -86,7 +86,7 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
   return (
     <form onSubmit={handleSubmit} className="p-4 space-y-4">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-leaf-green">Share Your Moments</h2>
+        <h2 className="text-2xl font-bold text-dark-leaf-green">Share Your Moments</h2>
       </div>
       
       <input
@@ -130,7 +130,7 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
       />
 
       <div>
-        <p className="text-sm font-medium text-gray-700 mb-2 text-center">Select a category</p>
+        <p className="text-sm font-medium text-neutral-gray mb-2 text-center">Select a category</p>
         <CategoryChips 
           value={category}
           onValueChange={setCategory}
@@ -146,7 +146,7 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
 
       <Button 
         type="submit" 
-        className="w-full bg-leaf-green hover:bg-leaf-green/90" 
+        className="w-full bg-dark-leaf-green hover:bg-dark-leaf-green/90" 
         disabled={isUploading || files.length === 0 || !category}
       >
         {isUploading ? "Sharing..." : `Share ${files.length} Photo${files.length > 1 ? 's' : ''}`}

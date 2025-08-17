@@ -19,7 +19,7 @@ const BottomNav = () => {
           className={({ isActive }) =>
             cn(
               "flex flex-col items-center justify-center w-full h-full text-gray-500 transition-colors",
-              isActive ? "text-leaf-green" : "hover:text-leaf-green/70"
+              isActive ? "text-dark-leaf-green" : "hover:text-dark-leaf-green/70"
             )
           }
         >
