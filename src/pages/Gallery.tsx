@@ -15,12 +15,14 @@ const Gallery = () => {
         
         {photos.length === 0 ? (
           <div className="text-center text-gray-500 mt-16 flex flex-col items-center">
-            <img 
-              src="/pookalam.svg" 
-              alt="Pookalam illustration" 
-              className="w-full max-w-xs sm:max-w-sm mx-auto mb-8"
-              onError={(e) => { e.currentTarget.src = '/placeholder.svg'; e.currentTarget.onerror = null; }}
-            />
+            <div className="w-full max-w-xs sm:max-w-sm mx-auto mb-8 p-4">
+              <img 
+                src="/pookalam.svg" 
+                alt="Pookalam illustration" 
+                className="w-full h-auto"
+                onError={(e) => { e.currentTarget.src = '/placeholder.svg'; e.currentTarget.onerror = null; }}
+              />
+            </div>
             <h2 className="text-2xl font-semibold text-gray-700">The Gallery Awaits!</h2>
             <p className="text-gray-600 mt-2">Be the first to share a vibrant Onam moment.</p>
           </div>

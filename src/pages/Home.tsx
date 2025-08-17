@@ -7,7 +7,7 @@ const Home = () => {
           Capture and share the vibrant moments of your Onam celebration.
         </p>
       </div>
-      <div className="my-8 max-w-xs sm:max-w-sm mx-auto">
+      <div className="my-8 max-w-xs sm:max-w-sm mx-auto p-4">
         <img 
           src="/pookalam.svg" 
           alt="Onam Pookalam" 
