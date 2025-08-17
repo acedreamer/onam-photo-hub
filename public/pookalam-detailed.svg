@@ -1,7 +1,12 @@
-<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="0.5">
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" stroke-width="0.5">
   <g transform="translate(50,50)">
+    {/* Central circles (drawn first to be in the background) */}
+    <circle cx="0" cy="0" r="49" fill="#228B22" stroke="#006400"/>
+    <circle cx="0" cy="0" r="35" fill="#FAFAF5" stroke="#D4AF37"/>
+    <circle cx="0" cy="0" r="24" fill="#FF69B4" stroke="#D4AF37"/>
+    
     {/* 8 large outer petals */}
-    <g>
+    <g fill="#FFD700" stroke="#D4AF37">
       <path d="M0,-48 C 15,-35 15,-15 0,-10 C -15,-15 -15,-35 0,-48 Z" transform="rotate(0)"/>
       <path d="M0,-48 C 15,-35 15,-15 0,-10 C -15,-15 -15,-35 0,-48 Z" transform="rotate(45)"/>
       <path d="M0,-48 C 15,-35 15,-15 0,-10 C -15,-15 -15,-35 0,-48 Z" transform="rotate(90)"/>
@@ -13,7 +18,7 @@
     </g>
 
     {/* 8 medium inner petals */}
-    <g transform="scale(0.7) rotate(22.5)">
+    <g transform="scale(0.7) rotate(22.5)" fill="#FF7F50" stroke="#D4AF37">
       <path d="M0,-48 C 15,-35 15,-15 0,-10 C -15,-15 -15,-35 0,-48 Z" transform="rotate(0)"/>
       <path d="M0,-48 C 15,-35 15,-15 0,-10 C -15,-15 -15,-35 0,-48 Z" transform="rotate(45)"/>
       <path d="M0,-48 C 15,-35 15,-15 0,-10 C -15,-15 -15,-35 0,-48 Z" transform="rotate(90)"/>
@@ -24,11 +29,8 @@
       <path d="M0,-48 C 15,-35 15,-15 0,-10 C -15,-15 -15,-35 0,-48 Z" transform="rotate(315)"/>
     </g>
 
-    {/* Central circles */}
-    <circle cx="0" cy="0" r="49"/>
-    <circle cx="0" cy="0" r="35"/>
-    <circle cx="0" cy="0" r="24"/>
-    <circle cx="0" cy="0" r="10"/>
-    <circle cx="0" cy="0" r="5" fill="currentColor"/>
+    {/* Innermost circles (drawn last to be on top) */}
+    <circle cx="0" cy="0" r="10" fill="#FAFAF5" stroke="#D4AF37"/>
+    <circle cx="0" cy="0" r="5" fill="#FFD700" stroke="#D4AF37"/>
   </g>
 </svg>
