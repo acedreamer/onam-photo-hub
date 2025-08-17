@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useGalleryStore } from "@/stores/galleryStore";
@@ -12,65 +12,79 @@ interface UploadFormProps {
 }
 
 const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
-  const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
   const [caption, setCaption] = useState("");
   const [category, setCategory] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const addPhoto = useGalleryStore((state) => state.addPhoto);
+  const addPhotos = useGalleryStore((state) => state.addPhotos);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setError(null);
-    const selectedFile = event.target.files?.[0];
-    if (selectedFile) {
-      if (!selectedFile.type.startsWith("image/")) {
-        setError("Please select a valid image file.");
-        resetSelection();
-        return;
+    const selectedFiles = event.target.files;
+    if (selectedFiles) {
+      const newFiles = Array.from(selectedFiles);
+      for (const file of newFiles) {
+        if (!file.type.startsWith("image/")) {
+          setError("Please select only valid image files.");
+          resetSelection();
+          return;
+        }
       }
-      setFile(selectedFile);
-      setPreview(URL.createObjectURL(selectedFile));
+      setFiles(newFiles);
+      const newPreviews = newFiles.map(file => URL.createObjectURL(file));
+      setPreviews(newPreviews);
     }
   };
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     setError(null);
-    if (!file || !category) {
-      setError("Please select a photo and choose a category.");
+    if (files.length === 0 || !category) {
+      setError("Please select at least one photo and choose a category.");
       return;
     }
 
     setIsUploading(true);
     
     setTimeout(() => {
-      const newPhoto = {
-        id: new Date().toISOString(),
+      const newPhotos = files.map(file => ({
+        id: `${new Date().toISOString()}-${file.name}`,
         src: URL.createObjectURL(file),
         caption,
         category,
-      };
-      addPhoto(newPhoto);
+      }));
+      addPhotos(newPhotos);
       setIsUploading(false);
-      showSuccess("🎉 Your Onam memory has been shared!");
+      const successMessage = files.length > 1 
+        ? `🎉 ${files.length} Onam memories have been shared!`
+        : "🎉 Your Onam memory has been shared!";
+      showSuccess(successMessage);
       onUploadComplete();
     }, 1500);
   };
 
   const resetSelection = () => {
-    setFile(null);
-    setPreview(null);
+    previews.forEach(url => URL.revokeObjectURL(url));
+    setFiles([]);
+    setPreviews([]);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
+  useEffect(() => {
+    return () => {
+      previews.forEach(url => URL.revokeObjectURL(url));
+    };
+  }, [previews]);
+
   return (
     <form onSubmit={handleSubmit} className="p-4 space-y-4">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-leaf-green">Share Your Moment</h2>
+        <h2 className="text-2xl font-bold text-leaf-green">Share Your Moments</h2>
       </div>
       
       <input
@@ -79,11 +93,18 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
         onChange={handleFileChange}
         accept="image/*"
         className="hidden"
+        multiple
       />
 
-      {preview ? (
-        <div className="w-full aspect-square rounded-lg overflow-hidden border-2 border-dashed border-gray-300 relative">
-          <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+      {previews.length > 0 ? (
+        <div className="relative">
+          <div className="grid grid-cols-3 gap-2 w-full aspect-square rounded-lg overflow-y-auto border-2 border-dashed border-gray-300 p-2">
+            {previews.map((src, index) => (
+              <div key={index} className="relative aspect-square">
+                <img src={src} alt={`Preview ${index + 1}`} className="w-full h-full object-cover rounded-md" />
+              </div>
+            ))}
+          </div>
           <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-8 w-8" onClick={resetSelection}>
             <X className="h-4 w-4" />
           </Button>
@@ -94,16 +115,16 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
           onClick={() => fileInputRef.current?.click()}
         >
           <ImageUp className="h-12 w-12 mb-2" />
-          <span className="font-medium">Click to select a photo</span>
+          <span className="font-medium">Click to select photos</span>
         </div>
       )}
 
       <Textarea
-        placeholder="Add a caption... (optional)"
+        placeholder="Add a caption for all photos... (optional)"
         value={caption}
         onChange={(e) => setCaption(e.target.value)}
         className="resize-none"
-        disabled={!preview}
+        disabled={previews.length === 0}
       />
 
       <div>
@@ -111,7 +132,7 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
         <CategoryChips 
           value={category}
           onValueChange={setCategory}
-          disabled={!preview}
+          disabled={previews.length === 0}
         />
       </div>
 
@@ -124,9 +145,9 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
       <Button 
         type="submit" 
         className="w-full bg-leaf-green hover:bg-leaf-green/90" 
-        disabled={isUploading || !file || !category}
+        disabled={isUploading || files.length === 0 || !category}
       >
-        {isUploading ? "Sharing..." : "Share Photo"}
+        {isUploading ? "Sharing..." : `Share ${files.length} Photo${files.length > 1 ? 's' : ''}`}
         {!isUploading && <Upload className="h-4 w-4 ml-2" />}
       </Button>
     </form>
