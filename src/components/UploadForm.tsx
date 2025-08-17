@@ -39,8 +39,8 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    if (!file || !caption || !category) {
-      showError("Please select or capture a photo, add a caption, and choose a category.");
+    if (!file || !category) {
+      showError("Please select or capture a photo and choose a category.");
       return;
     }
 
@@ -106,7 +106,7 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
         )}
 
         <Textarea
-          placeholder="Add a caption..."
+          placeholder="Add a caption... (optional)"
           value={caption}
           onChange={(e) => setCaption(e.target.value)}
           className="resize-none"
