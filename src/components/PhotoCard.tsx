@@ -8,14 +8,22 @@ interface PhotoCardProps {
 
 const PhotoCard = ({ photo }: PhotoCardProps) => {
   return (
-    <Card className="overflow-hidden break-inside-avoid">
-      <CardContent className="p-0">
-        <img src={photo.src} alt={photo.caption} className="w-full h-auto object-cover" />
+    <Card className="overflow-hidden break-inside-avoid rounded-2xl shadow-md">
+      <CardContent className="p-0 relative">
+        <img
+          src={photo.src}
+          alt={photo.caption}
+          className="w-full h-auto object-cover"
+        />
+        <Badge className="absolute top-3 right-3 bg-bright-gold text-dark-leaf-green pointer-events-none">
+          {photo.category}
+        </Badge>
       </CardContent>
-      <CardFooter className="p-4 flex flex-col items-start">
-        <Badge variant="secondary" className="mb-2 bg-leaf-green/20 text-leaf-green">{photo.category}</Badge>
-        <p className="text-sm text-gray-700">{photo.caption}</p>
-      </CardFooter>
+      {photo.caption && (
+        <CardFooter className="p-4">
+          <p className="text-sm text-gray-700 line-clamp-2">{photo.caption}</p>
+        </CardFooter>
+      )}
     </Card>
   );
 };
