@@ -19,6 +19,9 @@ export default {
     },
     extend: {
       colors: {
+        'kasavu-gold': '#D4AF37',
+        'leaf-green': '#228B22',
+        'ivory': '#FFFFF0',
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
