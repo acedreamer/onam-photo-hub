@@ -1,27 +1,15 @@
 <svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <radialGradient id="grad1" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#FFA500;stop-opacity:1" />
+    <radialGradient id="grad-center" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="0%" style="stop-color:#FFD700;" />
+      <stop offset="100%" style="stop-color:#FFA500;" />
     </radialGradient>
+    <path id="petal" d="M 0 -150 C 50 -100, 50 -50, 0 -40 C -50 -50, -50 -100, 0 -150" />
   </defs>
-  <circle cx="200" cy="200" r="190" fill="#FFFFF0" stroke="#228B22" stroke-width="5"/>
-  <circle cx="200" cy="200" r="20" fill="url(#grad1)"/>
-  <g transform="translate(200,200)">
-    <g id="petal-group">
-      <path d="M 0 -150 C 50 -100, 50 -50, 0 -30 C -50 -50, -50 -100, 0 -150" fill="#FF6347"/>
-    </g>
-    <use href="#petal-group" transform="rotate(45)"/>
-    <use href="#petal-group" transform="rotate(90)"/>
-    <use href="#petal-group" transform="rotate(135)"/>
-    <use href="#petal-group" transform="rotate(180)"/>
-    <use href="#petal-group" transform="rotate(225)"/>
-    <use href="#petal-group" transform="rotate(270)"/>
-    <use href="#petal-group" transform="rotate(315)"/>
-  </g>
+  <circle cx="200" cy="200" r="180" fill="none" stroke="#228B22" stroke-width="8"/>
   <g transform="translate(200,200)">
     <g id="leaf-group">
-      <ellipse cx="0" cy="-170" rx="15" ry="40" fill="#228B22" transform="rotate(22.5, 0, -170)"/>
+      <ellipse cx="0" cy="-180" rx="25" ry="50" fill="#228B22" transform="rotate(30 0 -180)"/>
     </g>
     <use href="#leaf-group" transform="rotate(45)"/>
     <use href="#leaf-group" transform="rotate(90)"/>
@@ -30,5 +18,21 @@
     <use href="#leaf-group" transform="rotate(225)"/>
     <use href="#leaf-group" transform="rotate(270)"/>
     <use href="#leaf-group" transform="rotate(315)"/>
+  </g>
+  <g transform="translate(200,200)">
+    <g id="petal-group" fill="#FF6347">
+      <use href="#petal" />
+      <use href="#petal" transform="rotate(45)"/>
+      <use href="#petal" transform="rotate(90)"/>
+      <use href="#petal" transform="rotate(135)"/>
+      <use href="#petal" transform="rotate(180)"/>
+      <use href="#petal" transform="rotate(225)"/>
+      <use href="#petal" transform="rotate(270)"/>
+      <use href="#petal" transform="rotate(315)"/>
+    </g>
+  </g>
+  <g transform="translate(200,200)">
+    <path d="M0,-35 L10.2,-10.8 L33.3,-10.8 L13.5,5.4 L20.6,28.3 L0,13.5 L-20.6,28.3 L-13.5,5.4 L-33.3,-10.8 L-10.2,-10.8 Z" fill="#FFFFFF"/>
+    <circle cx="0" cy="0" r="15" fill="url(#grad-center)"/>
   </g>
 </svg>

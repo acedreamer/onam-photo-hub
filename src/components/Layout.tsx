@@ -5,7 +5,7 @@ import UploadFab from "./UploadFab";
 const Layout = () => {
   return (
     <div className="min-h-screen bg-ivory font-sans">
-      <main className="pb-24 pt-4 px-4">
+      <main className="pb-28 pt-8 px-4">
         <Outlet />
       </main>
       <BottomNav />

@@ -11,7 +11,7 @@ const UploadFab = () => {
     <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
       <SheetTrigger asChild>
         <Button
-          className="fixed bottom-20 right-6 h-16 w-16 rounded-full bg-kasavu-gold shadow-lg hover:bg-kasavu-gold/90 z-50"
+          className="fixed bottom-24 right-6 h-16 w-16 rounded-full bg-kasavu-gold shadow-lg hover:bg-kasavu-gold/90 z-50"
           aria-label="Upload Photo"
         >
           <Camera className="h-8 w-8 text-white" />
