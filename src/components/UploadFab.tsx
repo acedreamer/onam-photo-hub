@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import UploadForm from "@/components/UploadForm";
 
-const UploadFab = () => {
+export default function UploadFab() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleUploadComplete = () => {
+  function handleUploadComplete() {
     setIsOpen(false);
-  };
+  }
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -32,6 +32,4 @@ const UploadFab = () => {
       </SheetContent>
     </Sheet>
   );
-};
-
-export default UploadFab;
+}
