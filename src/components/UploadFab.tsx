@@ -1,11 +1,18 @@
+import { useState } from "react";
 import { Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import UploadForm from "@/components/UploadForm";
 
 const UploadFab = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleUploadComplete = () => {
+    setIsOpen(false);
+  };
+
   return (
-    <Sheet>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         <Button 
           className="fixed bottom-24 right-6 h-16 w-16 rounded-full bg-gradient-to-br from-bright-gold to-kasavu-gold text-dark-leaf-green z-50 animate-ring-glow transition-transform duration-200 ease-in-out hover:scale-110 hover:animate-none border-2 border-ivory"
@@ -21,7 +28,7 @@ const UploadFab = () => {
             Upload a photo to the community gallery.
           </Description>
         </SheetHeader>
-        <UploadForm />
+        <UploadForm onUploadComplete={handleUploadComplete} />
       </SheetContent>
     </Sheet>
   );
