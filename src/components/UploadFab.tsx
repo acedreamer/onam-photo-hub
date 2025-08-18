@@ -1,42 +1,27 @@
 import { useState } from "react";
-import { Camera } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { 
-  Sheet as UiSheet, 
-  SheetTrigger as UiSheetTrigger, 
-  SheetContent as UiSheetContent, 
-  SheetHeader as UiSheetHeader, 
-  SheetTitle as UiSheetTitle, 
-  SheetDescription as UiSheetDescription 
-} from "@/components/ui/sheet";
-import UploadForm from "@/components/UploadForm";
+import { Camera } from "lucide-react";
+import UploadForm from "./UploadForm";
 
-export default function UploadFab() {
-  const [isOpen, setIsOpen] = useState(false);
-
-  function handleUploadComplete() {
-    setIsOpen(false);
-  }
+const UploadFab = () => {
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   return (
-    <UiSheet open={isOpen} onOpenChange={setIsOpen}>
-      <UiSheetTrigger asChild>
-        <Button 
-          className="fixed bottom-24 right-6 h-16 w-16 rounded-full bg-gradient-to-br from-bright-gold to-kasavu-gold text-dark-leaf-green z-50 animate-ring-glow transition-transform duration-200 ease-in-out hover:scale-110 hover:animate-none border-2 border-ivory"
+    <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+      <SheetTrigger asChild>
+        <Button
+          className="fixed bottom-24 right-6 h-16 w-16 rounded-full bg-bright-gold shadow-xl hover:bg-bright-gold/90 z-50 animate-pulse-slow transition-transform duration-200 ease-in-out hover:scale-110 hover:animate-none border-2 border-dark-leaf-green"
           aria-label="Upload Photo"
         >
-          <Camera size={32} />
+          <Camera className="h-8 w-8 text-white" />
         </Button>
-      </UiSheetTrigger>
-      <UiSheetContent side="bottom" className="rounded-t-2xl bg-ivory border-t-4 border-kasavu-gold">
-        <UiSheetHeader className="text-center mb-4">
-          <UiSheetTitle className="text-2xl text-dark-leaf-green">Share Your Onam Joy</UiSheetTitle>
-          <UiSheetDescription>
-            Upload a photo to the community gallery.
-          </UiSheetDescription>
-        </UiSheetHeader>
-        <UploadForm onUploadComplete={handleUploadComplete} />
-      </UiSheetContent>
-    </UiSheet>
+      </SheetTrigger>
+      <SheetContent side="bottom" className="rounded-t-lg bg-ivory p-0 max-h-[90vh] overflow-y-auto">
+        <UploadForm onUploadComplete={() => setIsSheetOpen(false)} />
+      </SheetContent>
+    </Sheet>
   );
-}
+};
+
+export default UploadFab;

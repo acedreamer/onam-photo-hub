@@ -99,26 +99,12 @@ export default {
           from: { transform: 'rotate(0deg)' },
           to: { transform: 'rotate(360deg)' },
         },
-        "bob-subtle": {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-4px)' },
-        },
-        "ring-glow": {
-          '0%, 100%': {
-            boxShadow: '0 0 0 0 rgba(255, 215, 0, 0.7), 0 25px 50px -12px rgb(0 0 0 / 0.25)'
-          },
-          '50%': {
-            boxShadow: '0 0 0 12px rgba(255, 215, 0, 0), 0 25px 50px -12px rgb(0 0 0 / 0.25)'
-          }
-        }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "pulse-slow": "pulse-slow 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         "spin-slow": "spin-slow 20s linear infinite",
-        "bob-subtle": "bob-subtle 2s ease-in-out infinite",
-        "ring-glow": "ring-glow 2.5s ease-out infinite",
       },
     },
   },
