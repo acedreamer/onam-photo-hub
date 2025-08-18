@@ -8,7 +8,7 @@ const UploadFab = () => {
     <Sheet>
       <SheetTrigger asChild>
         <Button 
-          className="fixed bottom-24 right-6 h-16 w-16 rounded-full bg-gradient-to-br from-bright-gold to-kasavu-gold text-dark-leaf-green shadow-2xl z-50 animate-bob-subtle transition-transform duration-200 ease-in-out hover:scale-110 border-2 border-ivory"
+          className="fixed bottom-24 right-6 h-16 w-16 rounded-full bg-gradient-to-br from-bright-gold to-kasavu-gold text-dark-leaf-green z-50 animate-ring-glow transition-transform duration-200 ease-in-out hover:scale-110 hover:animate-none border-2 border-ivory"
           aria-label="Upload Photo"
         >
           <Camera size={32} />
@@ -19,7 +19,7 @@ const UploadFab = () => {
           <SheetTitle className="text-2xl text-dark-leaf-green">Share Your Onam Joy</SheetTitle>
           <SheetDescription>
             Upload a photo to the community gallery.
-          </SheetDescription>
+          </Description>
         </SheetHeader>
         <UploadForm />
       </SheetContent>
