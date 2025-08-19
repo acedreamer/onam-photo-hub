@@ -1,14 +1,17 @@
-export const MadeWithDyad = () => {
+import { DyadLogo } from "./dyad-logo";
+
+export function MadeWithDyad() {
   return (
-    <div className="p-4 text-center">
+    <div className="">
       <a
         href="https://www.dyad.sh/"
         target="_blank"
         rel="noopener noreferrer"
-        className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+        className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
       >
-        Made with Dyad
+        <span className="font-semibold">Made with</span>
+        <DyadLogo className="w-16" />
       </a>
     </div>
   );
-};
+}
