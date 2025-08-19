@@ -8,6 +8,9 @@ import Home from "./pages/Home";
 import Gallery from "./pages/Gallery";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
+import Login from "./pages/Login";
+import { SessionProvider } from "./contexts/SessionContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -17,14 +20,19 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
-            <Route path="gallery" element={<Gallery />} />
-            <Route path="about" element={<About />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <SessionProvider>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/" element={<Layout />}>
+                <Route index element={<Home />} />
+                <Route path="gallery" element={<Gallery />} />
+                <Route path="about" element={<About />} />
+              </Route>
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </SessionProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
