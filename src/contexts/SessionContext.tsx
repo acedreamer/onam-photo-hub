@@ -21,16 +21,10 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    };
-
-    getSession();
-
+    // onAuthStateChange fires immediately with the session if it exists in storage.
+    // This handles both initial page loads and subsequent auth events like sign-in/sign-out.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      // This logic restricts logins to a specific email domain.
       if (event === 'SIGNED_IN' && session?.user) {
         const userEmail = session.user.email;
         const allowedDomain = 'cekottarakkara.ac.in';
@@ -39,13 +33,18 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
           showError(`Access is restricted to @${allowedDomain} emails.`);
           setSession(null);
           setUser(null);
+          setLoading(false); // Stop loading even on error
           return;
         }
       }
+      
       setSession(session);
       setUser(session?.user ?? null);
+      // The first time this callback runs, we know the session state is resolved.
+      setLoading(false);
     });
 
+    // Clean up the subscription when the component unmounts
     return () => {
       subscription.unsubscribe();
     };
@@ -59,6 +58,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
 
   return (
     <SessionContext.Provider value={value}>
+      {/* We wait until the initial loading is false before rendering children */}
       {!loading && children}
     </SessionContext.Provider>
   );
