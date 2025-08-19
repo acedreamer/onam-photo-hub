@@ -4,24 +4,28 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, Tag, Heart } from "lucide-react";
 import { format } from "date-fns";
+import { useSession } from "@/contexts/SessionContext";
+import { cn } from "@/lib/utils";
 
 interface PhotoDetailProps {
   photo: Photo;
 }
 
 const PhotoDetail = ({ photo }: PhotoDetailProps) => {
-  const addLike = useGalleryStore((state) => state.addLike);
+  const { user } = useSession();
+  const toggleLike = useGalleryStore((state) => state.toggleLike);
 
   const handleLike = () => {
-    addLike(photo.id);
+    if (!user) return;
+    toggleLike(photo.id, user.id);
   };
 
   return (
     <div className="flex flex-col md:flex-row gap-6 p-2">
       <div className="md:w-2/3 flex items-center justify-center">
         <img 
-          src={photo.src} 
-          alt={photo.caption} 
+          src={photo.image_url} 
+          alt={photo.caption || 'Onam photo'} 
           className="w-full h-auto object-contain rounded-lg max-h-[75vh]" 
         />
       </div>
@@ -37,12 +41,15 @@ const PhotoDetail = ({ photo }: PhotoDetailProps) => {
         <div className="flex items-center space-x-2">
           <Calendar className="h-5 w-5 text-gray-500" />
           <span className="text-sm text-neutral-gray">
-            {format(new Date(photo.createdAt), "MMMM d, yyyy 'at' h:mm a")}
+            {format(new Date(photo.created_at), "MMMM d, yyyy 'at' h:mm a")}
           </span>
         </div>
         <div className="flex items-center space-x-2 pt-2">
           <Button variant="ghost" size="icon" onClick={handleLike} className="group rounded-full">
-            <Heart className="h-6 w-6 text-gray-500 group-hover:text-red-500 group-hover:fill-red-500 transition-colors" />
+            <Heart className={cn(
+              "h-6 w-6 text-gray-500 group-hover:text-red-500 transition-colors",
+              photo.user_has_liked ? "fill-red-500 text-red-500" : "group-hover:fill-red-500"
+            )} />
           </Button>
           <span className="text-base font-medium text-neutral-gray">
             {photo.likes || 0} {photo.likes === 1 ? 'like' : 'likes'}

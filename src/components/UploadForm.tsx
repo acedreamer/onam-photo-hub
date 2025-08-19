@@ -2,10 +2,12 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useGalleryStore } from "@/stores/galleryStore";
-import { showSuccess } from "@/utils/toast";
+import { showSuccess, showError } from "@/utils/toast";
 import { ImageUp, Upload, X } from "lucide-react";
 import CategoryChips from "./CategoryChips";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useSession } from "@/contexts/SessionContext";
+import { supabase } from "@/integrations/supabase/client";
 
 interface UploadFormProps {
   onUploadComplete: () => void;
@@ -19,7 +21,8 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const addPhotos = useGalleryStore((state) => state.addPhotos);
+  const addPhoto = useGalleryStore((state) => state.addPhoto);
+  const { user } = useSession();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setError(null);
@@ -39,34 +42,61 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
     }
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError(null);
-    if (files.length === 0 || !category) {
+    if (files.length === 0 || !category || !user) {
       setError("Please select at least one photo and choose a category.");
       return;
     }
 
     setIsUploading(true);
     
-    setTimeout(() => {
-      const creationDate = new Date().toISOString();
-      const newPhotos = files.map((file, index) => ({
-        id: `${creationDate}-${index}-${file.name}`,
-        src: URL.createObjectURL(file),
-        caption,
-        category,
-        createdAt: creationDate,
-        likes: 0,
-      }));
-      addPhotos(newPhotos);
-      setIsUploading(false);
+    try {
+      for (const file of files) {
+        const filePath = `${user.id}/${Date.now()}-${file.name}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('photos')
+          .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('photos')
+          .getPublicUrl(filePath);
+
+        if (!publicUrl) throw new Error("Could not get public URL.");
+
+        const { data: newPhoto, error: insertError } = await supabase
+          .from('photos')
+          .insert({
+            user_id: user.id,
+            image_url: publicUrl,
+            caption,
+            category,
+          })
+          .select()
+          .single();
+
+        if (insertError) throw insertError;
+        
+        if (newPhoto) {
+          addPhoto(newPhoto);
+        }
+      }
+
       const successMessage = files.length > 1 
         ? `🎉 ${files.length} Onam memories have been shared!`
         : "🎉 Your Onam memory has been shared!";
       showSuccess(successMessage);
       onUploadComplete();
-    }, 1500);
+    } catch (err: any) {
+      console.error("Upload failed:", err);
+      showError(`Upload failed: ${err.message}`);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const resetSelection = () => {
