@@ -18,6 +18,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["Inter", "sans-serif"],
+        serif: ["Lora", "serif"],
+      },
       colors: {
         'kasavu-gold': '#D4AF37',
         'bright-gold': '#FFD700',

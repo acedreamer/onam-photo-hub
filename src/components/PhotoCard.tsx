@@ -50,7 +50,7 @@ const PhotoCard = ({ photo }: PhotoCardProps) => {
   const uploaderInitial = uploaderName.charAt(0).toUpperCase();
 
   return (
-    <Card className="overflow-hidden break-inside-avoid rounded-2xl shadow-md flex flex-col">
+    <Card className="overflow-hidden break-inside-avoid rounded-2xl shadow-md flex flex-col transition-transform duration-300 ease-in-out hover:scale-[1.02] hover:shadow-xl">
       <CardContent className="p-0 relative">
         <img
           src={photo.image_url}

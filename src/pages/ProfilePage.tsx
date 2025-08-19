@@ -5,14 +5,16 @@ import type { Photo, Profile } from '@/stores/galleryStore';
 import { useSession } from '@/contexts/SessionContext';
 import PhotoCard from '@/components/PhotoCard';
 import PhotoDetail from '@/components/PhotoDetail';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import EditProfileDialog from '@/components/EditProfileDialog';
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Loader2, Edit } from 'lucide-react';
 
 const PHOTOS_PER_PAGE = 12;
 
-const Profile = () => {
+const ProfilePage = () => {
   const { userId } = useParams<{ userId: string }>();
   const { user: currentUser } = useSession();
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -22,6 +24,7 @@ const Profile = () => {
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const fetchProfileAndPhotos = useCallback(async (currentPage: number) => {
     if (!userId || !currentUser) return;
@@ -33,7 +36,7 @@ const Profile = () => {
       if (currentPage === 0) {
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .select('full_name, avatar_url')
+          .select('full_name, avatar_url, bio')
           .eq('id', userId)
           .single();
         if (profileError) throw profileError;
@@ -94,6 +97,7 @@ const Profile = () => {
         <div className="flex flex-col items-center space-y-4">
           <Skeleton className="h-24 w-24 rounded-full" />
           <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-64" />
         </div>
         <div className="columns-2 sm:columns-3 gap-4 space-y-4">
           {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-40 w-full rounded-2xl" />)}
@@ -104,16 +108,26 @@ const Profile = () => {
 
   const uploaderName = profile?.full_name || "Anonymous";
   const uploaderInitial = uploaderName.charAt(0).toUpperCase();
+  const isOwnProfile = currentUser?.id === userId;
 
   return (
     <>
       <div className="space-y-8">
-        <div className="flex flex-col items-center text-center space-y-2">
+        <div className="flex flex-col items-center text-center space-y-4">
           <Avatar className="h-24 w-24 border-4 border-bright-gold">
             <AvatarImage src={profile?.avatar_url || undefined} alt={uploaderName} />
             <AvatarFallback className="text-4xl">{uploaderInitial}</AvatarFallback>
           </Avatar>
-          <h1 className="text-3xl font-bold text-dark-leaf-green">{uploaderName}'s Gallery</h1>
+          <div>
+            <h1 className="text-3xl font-bold text-dark-leaf-green font-serif">{uploaderName}'s Gallery</h1>
+            {profile?.bio && <p className="mt-2 text-neutral-gray max-w-md">{profile.bio}</p>}
+          </div>
+          {isOwnProfile && (
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(true)}>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit Profile
+            </Button>
+          )}
         </div>
 
         {photos.length === 0 ? (
@@ -144,8 +158,17 @@ const Profile = () => {
           {selectedPhoto && <PhotoDetail photo={selectedPhoto} onClose={() => setSelectedPhoto(null)} />}
         </DialogContent>
       </Dialog>
+
+      {isOwnProfile && profile && (
+        <EditProfileDialog
+          profile={profile}
+          isOpen={isEditDialogOpen}
+          onOpenChange={setIsEditDialogOpen}
+          onProfileUpdate={(updatedProfile) => setProfile(updatedProfile)}
+        />
+      )}
     </>
   );
 };
 
-export default Profile;
+export default ProfilePage;

@@ -65,7 +65,7 @@ const Gallery = () => {
     <>
       <div className="space-y-8">
         <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold text-dark-leaf-green">Community Gallery</h1>
+          <h1 className="text-4xl font-bold text-dark-leaf-green font-serif">Community Gallery</h1>
           <p className="text-neutral-gray">Explore the vibrant moments of our Onam celebration.</p>
         </div>
 
@@ -107,7 +107,7 @@ const Gallery = () => {
                 onError={(e) => { e.currentTarget.src = '/placeholder.svg'; e.currentTarget.onerror = null; }}
               />
             </div>
-            <h2 className="text-2xl font-semibold text-neutral-gray">The Gallery Awaits!</h2>
+            <h2 className="text-2xl font-semibold text-neutral-gray font-serif">The Gallery Awaits!</h2>
             <p className="text-neutral-gray mt-2">Be the first to share a vibrant Onam moment.</p>
           </div>
         ) : (

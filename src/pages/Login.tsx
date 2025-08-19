@@ -63,7 +63,7 @@ const Login = () => {
             className="w-24 h-24 mx-auto mb-4 animate-spin-slow"
             onError={(e) => { e.currentTarget.src = '/placeholder.svg'; e.currentTarget.onerror = null; }}
           />
-          <h1 className="text-3xl font-bold text-dark-leaf-green">Welcome Back!</h1>
+          <h1 className="text-3xl font-bold text-dark-leaf-green font-serif">Welcome Back!</h1>
           <p className="text-neutral-gray mt-2">
             Sign in to continue your celebration.
           </p>
