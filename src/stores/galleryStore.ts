@@ -76,9 +76,10 @@ export const useGalleryStore = create<GalleryState>((set, get) => ({
         page: state.page + 1,
         hasMore: newPhotosWithLikeStatus.length === PHOTOS_PER_PAGE,
       }));
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching photos:", error);
-      showError("Could not load more photos.");
+      const errorMessage = error.message || "Could not load more photos.";
+      showError(errorMessage);
     } finally {
       set({ loading: false });
     }
