@@ -7,6 +7,7 @@ import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Gallery from "./pages/Gallery";
 import About from "./pages/About";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import { SessionProvider } from "./contexts/SessionContext";
@@ -28,6 +29,7 @@ const App = () => (
                 <Route index element={<Home />} />
                 <Route path="gallery" element={<Gallery />} />
                 <Route path="about" element={<About />} />
+                <Route path="profile/:userId" element={<Profile />} />
               </Route>
             </Route>
             <Route path="*" element={<NotFound />} />

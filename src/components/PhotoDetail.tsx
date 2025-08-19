@@ -2,7 +2,7 @@ import type { Photo } from "@/stores/galleryStore";
 import { useGalleryStore } from "@/stores/galleryStore";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Tag, Heart, Trash2 } from "lucide-react";
+import { Calendar, Tag, Heart, Trash2, User } from "lucide-react";
 import { format } from "date-fns";
 import { useSession } from "@/contexts/SessionContext";
 import { cn } from "@/lib/utils";
@@ -18,6 +18,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { showError } from "@/utils/toast";
+import { Link } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 interface PhotoDetailProps {
   photo: Photo;
@@ -43,6 +45,9 @@ const PhotoDetail = ({ photo, onClose }: PhotoDetailProps) => {
     }
   };
 
+  const uploaderName = photo.profiles?.full_name || "Anonymous";
+  const uploaderInitial = uploaderName.charAt(0).toUpperCase();
+
   return (
     <div className="flex flex-col md:flex-row gap-6 p-2">
       <div className="md:w-2/3 flex items-center justify-center">
@@ -53,10 +58,25 @@ const PhotoDetail = ({ photo, onClose }: PhotoDetailProps) => {
         />
       </div>
       <div className="md:w-1/3 flex flex-col space-y-4 pt-4">
-        <div>
-          <h3 className="text-xl font-bold text-dark-leaf-green mb-2">Details</h3>
-          <p className="text-neutral-gray">{photo.caption}</p>
-        </div>
+        <Link to={`/profile/${photo.user_id}`} onClick={onClose}>
+          <div className="flex items-center space-x-3 group mb-4">
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={photo.profiles?.avatar_url || undefined} alt={uploaderName} />
+              <AvatarFallback>{uploaderInitial}</AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-semibold text-neutral-gray group-hover:text-dark-leaf-green transition-colors">{uploaderName}</p>
+              <p className="text-xs text-gray-500">View Profile</p>
+            </div>
+          </div>
+        </Link>
+
+        {photo.caption && (
+          <div>
+            <p className="text-neutral-gray">{photo.caption}</p>
+          </div>
+        )}
+
         <div className="flex items-center space-x-2">
           <Tag className="h-5 w-5 text-gray-500" />
           <Badge variant="secondary" className="bg-dark-leaf-green/20 text-dark-leaf-green">{photo.category}</Badge>
@@ -64,7 +84,7 @@ const PhotoDetail = ({ photo, onClose }: PhotoDetailProps) => {
         <div className="flex items-center space-x-2">
           <Calendar className="h-5 w-5 text-gray-500" />
           <span className="text-sm text-neutral-gray">
-            {format(new Date(photo.created_at), "MMMM d, yyyy 'at' h:mm a")}
+            {format(new Date(photo.created_at), "MMMM d, yyyy")}
           </span>
         </div>
         <div className="flex items-center space-x-2 pt-2">

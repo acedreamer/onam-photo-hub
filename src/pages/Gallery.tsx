@@ -1,56 +1,47 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { useGalleryStore, type Photo } from "@/stores/galleryStore";
 import PhotoCard from "@/components/PhotoCard";
 import PhotoDetail from "@/components/PhotoDetail";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/contexts/SessionContext";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
 
 const Gallery = () => {
-  const { photos, setPhotos } = useGalleryStore();
+  const { photos, fetchPhotos, loading, hasMore, resetGallery } = useGalleryStore();
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
   const { user } = useSession();
-  const [isLoading, setIsLoading] = useState(true);
+  const [initialLoad, setInitialLoad] = useState(true);
+
+  const observer = useRef<IntersectionObserver>();
+  const lastPhotoElementRef = useCallback((node: HTMLDivElement) => {
+    if (loading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore && user) {
+        fetchPhotos(user.id);
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loading, hasMore, user, fetchPhotos]);
 
   useEffect(() => {
-    const fetchPhotos = async () => {
-      if (!user) return;
-      setIsLoading(true);
-
-      try {
-        const { data: photosData, error: photosError } = await supabase
-          .from("photos")
-          .select("*, cloudinary_public_id")
-          .order("created_at", { ascending: false });
-
-        if (photosError) throw photosError;
-
-        const { data: likesData, error: likesError } = await supabase
-          .from("likes")
-          .select("photo_id")
-          .eq("user_id", user.id);
-
-        if (likesError) throw likesError;
-
-        const likedPhotoIds = new Set(likesData?.map(like => like.photo_id) || []);
-        setPhotos(photosData || [], likedPhotoIds);
-      } catch (error) {
-        console.error("Error fetching gallery data:", error);
-      } finally {
-        setIsLoading(false);
-      }
+    resetGallery();
+    if (user) {
+      fetchPhotos(user.id).finally(() => setInitialLoad(false));
+    }
+    return () => {
+      resetGallery();
     };
-
-    fetchPhotos();
-  }, [user, setPhotos]);
+  }, [user, fetchPhotos, resetGallery]);
 
   return (
     <>
       <div>
         <h1 className="text-4xl font-bold text-dark-leaf-green mb-8 text-center">Community Gallery</h1>
         
-        {isLoading ? (
+        {initialLoad ? (
           <div className="columns-2 sm:columns-3 gap-4 space-y-4">
             {Array.from({ length: 9 }).map((_, i) => (
               <div key={i} className="break-inside-avoid">
@@ -58,7 +49,7 @@ const Gallery = () => {
               </div>
             ))}
           </div>
-        ) : photos.length === 0 ? (
+        ) : photos.length === 0 && !loading ? (
           <div className="text-center text-neutral-gray mt-16 flex flex-col items-center">
             <div className="w-full max-w-xs sm:max-w-sm mx-auto mb-8">
               <img 
@@ -73,11 +64,21 @@ const Gallery = () => {
           </div>
         ) : (
           <div className="columns-2 sm:columns-3 gap-4 space-y-4">
-            {photos.map((photo) => (
-              <div key={photo.id} className="cursor-pointer" onClick={() => setSelectedPhoto(photo)}>
+            {photos.map((photo, index) => (
+              <div 
+                key={photo.id} 
+                ref={index === photos.length - 1 ? lastPhotoElementRef : null}
+                className="cursor-pointer" 
+                onClick={() => setSelectedPhoto(photo)}
+              >
                 <PhotoCard photo={photo} />
               </div>
             ))}
+          </div>
+        )}
+        {loading && !initialLoad && (
+          <div className="flex justify-center items-center mt-8">
+            <Loader2 className="h-8 w-8 animate-spin text-dark-leaf-green" />
           </div>
         )}
       </div>

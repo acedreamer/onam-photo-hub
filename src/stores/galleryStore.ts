@@ -2,6 +2,13 @@ import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
 import { showError, showSuccess } from '@/utils/toast';
 
+const PHOTOS_PER_PAGE = 12;
+
+export type Profile = {
+  full_name: string | null;
+  avatar_url: string | null;
+};
+
 export type Photo = {
   id: string;
   user_id: string;
@@ -12,11 +19,16 @@ export type Photo = {
   created_at: string;
   cloudinary_public_id: string | null;
   user_has_liked?: boolean;
+  profiles: Profile | null;
 };
 
 type GalleryState = {
   photos: Photo[];
-  setPhotos: (photos: Photo[], likedPhotoIds: Set<string>) => void;
+  page: number;
+  hasMore: boolean;
+  loading: boolean;
+  fetchPhotos: (userId: string) => Promise<void>;
+  resetGallery: () => void;
   addPhoto: (photo: Photo) => void;
   toggleLike: (photoId: string, userId: string) => void;
   removePhoto: (photoId: string, cloudinaryPublicId: string) => Promise<void>;
@@ -24,12 +36,52 @@ type GalleryState = {
 
 export const useGalleryStore = create<GalleryState>((set, get) => ({
   photos: [],
-  setPhotos: (photos, likedPhotoIds) => {
-    const photosWithLikeStatus = photos.map(photo => ({
-      ...photo,
-      user_has_liked: likedPhotoIds.has(photo.id),
-    }));
-    set({ photos: photosWithLikeStatus.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) });
+  page: 0,
+  hasMore: true,
+  loading: false,
+  resetGallery: () => set({ photos: [], page: 0, hasMore: true }),
+  fetchPhotos: async (currentUserId) => {
+    const { loading, hasMore, page } = get();
+    if (loading || !hasMore) return;
+
+    set({ loading: true });
+
+    try {
+      const from = page * PHOTOS_PER_PAGE;
+      const to = from + PHOTOS_PER_PAGE - 1;
+
+      const { data: photosData, error: photosError } = await supabase
+        .from("photos")
+        .select("*, profiles(full_name, avatar_url)")
+        .order("created_at", { ascending: false })
+        .range(from, to);
+
+      if (photosError) throw photosError;
+
+      const { data: likesData, error: likesError } = await supabase
+        .from("likes")
+        .select("photo_id")
+        .eq("user_id", currentUserId);
+
+      if (likesError) throw likesError;
+      const likedPhotoIds = new Set(likesData?.map(like => like.photo_id) || []);
+
+      const newPhotosWithLikeStatus = (photosData || []).map(photo => ({
+        ...photo,
+        user_has_liked: likedPhotoIds.has(photo.id),
+      }));
+
+      set((state) => ({
+        photos: [...state.photos, ...newPhotosWithLikeStatus],
+        page: state.page + 1,
+        hasMore: newPhotosWithLikeStatus.length === PHOTOS_PER_PAGE,
+      }));
+    } catch (error) {
+      console.error("Error fetching photos:", error);
+      showError("Could not load more photos.");
+    } finally {
+      set({ loading: false });
+    }
   },
   addPhoto: (photo) => {
     const newPhoto = { ...photo, user_has_liked: false };

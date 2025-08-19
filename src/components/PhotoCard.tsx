@@ -18,6 +18,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { showError } from "@/utils/toast";
+import { Link } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 interface PhotoCardProps {
   photo: Photo;
@@ -44,8 +46,11 @@ const PhotoCard = ({ photo }: PhotoCardProps) => {
     }
   };
 
+  const uploaderName = photo.profiles?.full_name || "Anonymous";
+  const uploaderInitial = uploaderName.charAt(0).toUpperCase();
+
   return (
-    <Card className="overflow-hidden break-inside-avoid rounded-2xl shadow-md">
+    <Card className="overflow-hidden break-inside-avoid rounded-2xl shadow-md flex flex-col">
       <CardContent className="p-0 relative">
         <img
           src={photo.image_url}
@@ -84,10 +89,18 @@ const PhotoCard = ({ photo }: PhotoCardProps) => {
           </AlertDialog>
         )}
       </CardContent>
-      <CardFooter className="p-3 flex justify-between items-center min-h-[52px]">
-        {photo.caption ? (
-          <p className="text-sm text-neutral-gray line-clamp-2 flex-1 mr-2">{photo.caption}</p>
-        ) : <div className="flex-1" />}
+      <CardFooter className="p-3 flex justify-between items-center mt-auto bg-white/50">
+        <Link to={`/profile/${photo.user_id}`} onClick={stopPropagation} className="flex-1 min-w-0">
+          <div className="flex items-center space-x-2 group">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={photo.profiles?.avatar_url || undefined} alt={uploaderName} />
+              <AvatarFallback>{uploaderInitial}</AvatarFallback>
+            </Avatar>
+            <span className="text-sm font-semibold text-neutral-gray truncate group-hover:text-dark-leaf-green transition-colors">
+              {uploaderName}
+            </span>
+          </div>
+        </Link>
         <div className="flex items-center space-x-1 shrink-0">
             <Button variant="ghost" size="icon" className="h-8 w-8 group" onClick={handleLikeClick}>
                 <Heart className={cn(
