@@ -92,7 +92,7 @@ const Gallery = () => {
                   {selectedPhoto.caption || `An Onam celebration photo in the ${selectedPhoto.category} category.`}
                 </DialogDescription>
               </DialogHeader>
-              <PhotoDetail photo={selectedPhoto} />
+              <PhotoDetail photo={selectedPhoto} onClose={() => setSelectedPhoto(null)} />
             </>
           )}
         </DialogContent>

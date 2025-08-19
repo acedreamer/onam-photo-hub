@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
-import { showError } from '@/utils/toast';
+import { showError, showSuccess } from '@/utils/toast';
 
 export type Photo = {
   id: string;
@@ -18,6 +18,7 @@ type GalleryState = {
   setPhotos: (photos: Photo[], likedPhotoIds: Set<string>) => void;
   addPhoto: (photo: Photo) => void;
   toggleLike: (photoId: string, userId: string) => void;
+  removePhoto: (photoId: string, imageUrl: string) => Promise<void>;
 };
 
 export const useGalleryStore = create<GalleryState>((set, get) => ({
@@ -38,7 +39,6 @@ export const useGalleryStore = create<GalleryState>((set, get) => ({
     const photo = photos.find(p => p.id === photoId);
     if (!photo) return;
 
-    // Optimistic UI update
     const originalPhotoState = { ...photo };
     const updatedPhotos = photos.map(p =>
       p.id === photoId
@@ -53,24 +53,37 @@ export const useGalleryStore = create<GalleryState>((set, get) => ({
 
     try {
       if (originalPhotoState.user_has_liked) {
-        // Unlike the photo
-        const { error } = await supabase
-          .from('likes')
-          .delete()
-          .match({ user_id: userId, photo_id: photoId });
+        const { error } = await supabase.from('likes').delete().match({ user_id: userId, photo_id: photoId });
         if (error) throw error;
       } else {
-        // Like the photo
-        const { error } = await supabase
-          .from('likes')
-          .insert({ user_id: userId, photo_id: photoId });
+        const { error } = await supabase.from('likes').insert({ user_id: userId, photo_id: photoId });
         if (error) throw error;
       }
     } catch (error) {
       console.error("Failed to toggle like:", error);
       showError("Could not update like. Please try again.");
-      // Revert optimistic update on failure
       set({ photos: photos.map(p => p.id === photoId ? originalPhotoState : p) });
+    }
+  },
+  removePhoto: async (photoId, imageUrl) => {
+    const originalPhotos = get().photos;
+    set((state) => ({
+      photos: state.photos.filter((p) => p.id !== photoId),
+    }));
+
+    try {
+      const filePath = new URL(imageUrl).pathname.split('/photos/')[1];
+      const { error: storageError } = await supabase.storage.from('photos').remove([filePath]);
+      if (storageError) throw storageError;
+
+      const { error: dbError } = await supabase.from('photos').delete().match({ id: photoId });
+      if (dbError) throw dbError;
+
+      showSuccess("Photo deleted by admin.");
+    } catch (error: any) {
+      console.error("Failed to delete photo:", error);
+      showError("Could not delete photo. Please try again.");
+      set({ photos: originalPhotos });
     }
   },
 }));

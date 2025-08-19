@@ -2,22 +2,39 @@ import type { Photo } from "@/stores/galleryStore";
 import { useGalleryStore } from "@/stores/galleryStore";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Tag, Heart } from "lucide-react";
+import { Calendar, Tag, Heart, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { useSession } from "@/contexts/SessionContext";
 import { cn } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface PhotoDetailProps {
   photo: Photo;
+  onClose: () => void;
 }
 
-const PhotoDetail = ({ photo }: PhotoDetailProps) => {
-  const { user } = useSession();
-  const toggleLike = useGalleryStore((state) => state.toggleLike);
+const PhotoDetail = ({ photo, onClose }: PhotoDetailProps) => {
+  const { user, isAdmin } = useSession();
+  const { toggleLike, removePhoto } = useGalleryStore();
 
   const handleLike = () => {
     if (!user) return;
     toggleLike(photo.id, user.id);
+  };
+
+  const handleDelete = async () => {
+    await removePhoto(photo.id, photo.image_url);
+    onClose();
   };
 
   return (
@@ -55,6 +72,32 @@ const PhotoDetail = ({ photo }: PhotoDetailProps) => {
             {photo.likes || 0} {photo.likes === 1 ? 'like' : 'likes'}
           </span>
         </div>
+        {isAdmin && (
+          <div className="pt-4 mt-auto border-t">
+             <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" className="w-full">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Photo (Admin)
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete the photo.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete}>
+                    Yes, delete photo
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        )}
       </div>
     </div>
   );

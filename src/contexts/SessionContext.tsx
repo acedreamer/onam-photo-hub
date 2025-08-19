@@ -7,24 +7,24 @@ interface SessionContextValue {
   session: Session | null;
   user: User | null;
   loading: boolean;
+  isAdmin: boolean;
 }
 
 const SessionContext = createContext<SessionContextValue>({
   session: null,
   user: null,
   loading: true,
+  isAdmin: false,
 });
 
 export const SessionProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // onAuthStateChange fires immediately with the session if it exists in storage.
-    // This handles both initial page loads and subsequent auth events like sign-in/sign-out.
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      // This logic restricts logins to a specific email domain.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
         const userEmail = session.user.email;
         const allowedDomain = 'cekottarakkara.ac.in';
@@ -33,18 +33,30 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
           showError(`Access is restricted to @${allowedDomain} emails.`);
           setSession(null);
           setUser(null);
-          setLoading(false); // Stop loading even on error
+          setIsAdmin(false);
+          setLoading(false);
           return;
         }
       }
       
       setSession(session);
       setUser(session?.user ?? null);
-      // The first time this callback runs, we know the session state is resolved.
+
+      if (session?.user) {
+        const { data } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', session.user.id)
+          .single();
+        
+        setIsAdmin(data?.role === 'admin');
+      } else {
+        setIsAdmin(false);
+      }
+
       setLoading(false);
     });
 
-    // Clean up the subscription when the component unmounts
     return () => {
       subscription.unsubscribe();
     };
@@ -54,11 +66,11 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     session,
     user,
     loading,
+    isAdmin,
   };
 
   return (
     <SessionContext.Provider value={value}>
-      {/* We wait until the initial loading is false before rendering children */}
       {!loading && children}
     </SessionContext.Provider>
   );
