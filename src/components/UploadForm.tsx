@@ -54,27 +54,27 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
     
     try {
       for (const file of files) {
-        const filePath = `${user.id}/${Date.now()}-${file.name}`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from('photos')
-          .upload(filePath, file);
+        const formData = new FormData();
+        formData.append('file', file);
 
-        if (uploadError) throw uploadError;
+        const { data: uploadData, error: functionError } = await supabase.functions.invoke(
+          'cloudinary-upload',
+          { body: formData }
+        );
 
-        const { data: { publicUrl } } = supabase.storage
-          .from('photos')
-          .getPublicUrl(filePath);
-
-        if (!publicUrl) throw new Error("Could not get public URL.");
+        if (functionError) throw functionError;
+        if (!uploadData.secure_url || !uploadData.public_id) {
+          throw new Error("Cloudinary upload did not return a valid URL or public ID.");
+        }
 
         const { data: newPhoto, error: insertError } = await supabase
           .from('photos')
           .insert({
             user_id: user.id,
-            image_url: publicUrl,
+            image_url: uploadData.secure_url,
             caption,
             category,
+            cloudinary_public_id: uploadData.public_id,
           })
           .select()
           .single();
@@ -93,7 +93,9 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
       onUploadComplete();
     } catch (err: any) {
       console.error("Upload failed:", err);
-      showError(`Upload failed: ${err.message}`);
+      const errorMessage = err.message || "An unknown error occurred during upload.";
+      showError(`Upload failed: ${errorMessage}`);
+      setError(`Upload failed: ${errorMessage}`);
     } finally {
       setIsUploading(false);
     }

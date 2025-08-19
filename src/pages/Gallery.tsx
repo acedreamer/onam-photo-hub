@@ -21,7 +21,7 @@ const Gallery = () => {
       try {
         const { data: photosData, error: photosError } = await supabase
           .from("photos")
-          .select("*")
+          .select("*, cloudinary_public_id")
           .order("created_at", { ascending: false });
 
         if (photosError) throw photosError;

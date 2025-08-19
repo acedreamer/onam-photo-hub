@@ -17,6 +17,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { showError } from "@/utils/toast";
 
 interface PhotoDetailProps {
   photo: Photo;
@@ -33,8 +34,13 @@ const PhotoDetail = ({ photo, onClose }: PhotoDetailProps) => {
   };
 
   const handleDelete = async () => {
-    await removePhoto(photo.id, photo.image_url);
-    onClose();
+    if (photo.cloudinary_public_id) {
+      await removePhoto(photo.id, photo.cloudinary_public_id);
+      onClose();
+    } else {
+      showError("Cannot delete photo: Cloudinary ID is missing.");
+      onClose();
+    }
   };
 
   return (
@@ -86,7 +92,7 @@ const PhotoDetail = ({ photo, onClose }: PhotoDetailProps) => {
                   <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                   <AlertDialogDescription>
                     This action cannot be undone. This will permanently delete the photo.
-                  </AlertDialogDescription>
+                  </Description>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>

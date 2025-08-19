@@ -10,6 +10,7 @@ export type Photo = {
   category: string;
   likes: number;
   created_at: string;
+  cloudinary_public_id: string | null;
   user_has_liked?: boolean;
 };
 
@@ -18,7 +19,7 @@ type GalleryState = {
   setPhotos: (photos: Photo[], likedPhotoIds: Set<string>) => void;
   addPhoto: (photo: Photo) => void;
   toggleLike: (photoId: string, userId: string) => void;
-  removePhoto: (photoId: string, imageUrl: string) => Promise<void>;
+  removePhoto: (photoId: string, cloudinaryPublicId: string) => Promise<void>;
 };
 
 export const useGalleryStore = create<GalleryState>((set, get) => ({
@@ -65,16 +66,22 @@ export const useGalleryStore = create<GalleryState>((set, get) => ({
       set({ photos: photos.map(p => p.id === photoId ? originalPhotoState : p) });
     }
   },
-  removePhoto: async (photoId, imageUrl) => {
+  removePhoto: async (photoId, cloudinaryPublicId) => {
+    if (!cloudinaryPublicId) {
+      showError("Cannot delete this photo: Cloudinary ID is missing.");
+      return;
+    }
+
     const originalPhotos = get().photos;
     set((state) => ({
       photos: state.photos.filter((p) => p.id !== photoId),
     }));
 
     try {
-      const filePath = new URL(imageUrl).pathname.split('/photos/')[1];
-      const { error: storageError } = await supabase.storage.from('photos').remove([filePath]);
-      if (storageError) throw storageError;
+      const { error: functionError } = await supabase.functions.invoke('cloudinary-delete', {
+        body: { public_id: cloudinaryPublicId },
+      });
+      if (functionError) throw new Error(`Cloudinary delete failed: ${functionError.message}`);
 
       const { error: dbError } = await supabase.from('photos').delete().match({ id: photoId });
       if (dbError) throw dbError;
@@ -82,7 +89,7 @@ export const useGalleryStore = create<GalleryState>((set, get) => ({
       showSuccess("Photo deleted by admin.");
     } catch (error: any) {
       console.error("Failed to delete photo:", error);
-      showError("Could not delete photo. Please try again.");
+      showError(`Could not delete photo: ${error.message}`);
       set({ photos: originalPhotos });
     }
   },

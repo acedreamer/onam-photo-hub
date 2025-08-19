@@ -17,6 +17,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { showError } from "@/utils/toast";
 
 interface PhotoCardProps {
   photo: Photo;
@@ -36,7 +37,11 @@ const PhotoCard = ({ photo }: PhotoCardProps) => {
   const stopPropagation = (e: React.MouseEvent) => e.stopPropagation();
 
   const handleConfirmDelete = async () => {
-    await removePhoto(photo.id, photo.image_url);
+    if (photo.cloudinary_public_id) {
+      await removePhoto(photo.id, photo.cloudinary_public_id);
+    } else {
+      showError("Cannot delete photo: Cloudinary ID is missing.");
+    }
   };
 
   return (
