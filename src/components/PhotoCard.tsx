@@ -56,6 +56,7 @@ const PhotoCard = ({ photo }: PhotoCardProps) => {
           src={photo.image_url}
           alt={photo.caption || 'Onam photo'}
           className="w-full h-auto object-cover"
+          onContextMenu={(e) => e.preventDefault()}
         />
         <Badge className="absolute top-3 right-3 bg-bright-gold text-dark-leaf-green pointer-events-none">
           {photo.category}

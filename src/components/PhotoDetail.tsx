@@ -55,6 +55,7 @@ const PhotoDetail = ({ photo, onClose }: PhotoDetailProps) => {
           src={photo.image_url} 
           alt={photo.caption || 'Onam photo'} 
           className="w-full h-auto object-contain rounded-lg max-h-[75vh]" 
+          onContextMenu={(e) => e.preventDefault()}
         />
       </div>
       <div className="md:w-1/3 flex flex-col space-y-4 pt-4">
