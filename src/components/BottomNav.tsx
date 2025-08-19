@@ -1,21 +1,24 @@
 import { NavLink } from "react-router-dom";
-import { Home, LayoutGrid, Info } from "lucide-react";
+import { LayoutGrid, Info, User } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const navItems = [
-  { href: "/", label: "Home", icon: Home },
-  { href: "/gallery", label: "Gallery", icon: LayoutGrid },
-  { href: "/about", label: "About", icon: Info },
-];
+import { useSession } from "@/contexts/SessionContext";
 
 const BottomNav = () => {
+  const { user } = useSession();
+
+  const navItems = [
+    { href: "/", label: "Gallery", icon: LayoutGrid },
+    ...(user ? [{ href: `/profile/${user.id}`, label: "My Profile", icon: User }] : []),
+    { href: "/about", label: "About", icon: Info },
+  ];
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 h-20 bg-ivory border-t border-gray-200/80 flex justify-around items-center z-40">
       {navItems.map((item) => (
         <NavLink
           key={item.href}
           to={item.href}
-          end
+          end={item.href === "/"}
           className={({ isActive }) =>
             cn(
               "flex flex-col items-center justify-center w-full h-full text-gray-500 transition-colors",

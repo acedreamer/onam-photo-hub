@@ -1,9 +1,12 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import BottomNav from "./BottomNav";
 import UploadFab from "./UploadFab";
 import Header from "./Header";
 
 const Layout = () => {
+  const location = useLocation();
+  const showFab = location.pathname === '/' || location.pathname.startsWith('/profile');
+
   return (
     <div className="min-h-screen bg-ivory font-sans">
       <Header />
@@ -11,7 +14,7 @@ const Layout = () => {
         <Outlet />
       </main>
       <BottomNav />
-      <UploadFab />
+      {showFab && <UploadFab />}
     </div>
   );
 };

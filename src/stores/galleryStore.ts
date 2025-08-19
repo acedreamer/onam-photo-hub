@@ -22,12 +22,18 @@ export type Photo = {
   profiles: Profile | null;
 };
 
+type SortByType = 'created_at' | 'likes';
+
 type GalleryState = {
   photos: Photo[];
   page: number;
   hasMore: boolean;
   loading: boolean;
+  filterCategory: string;
+  sortBy: SortByType;
   fetchPhotos: (userId: string) => Promise<void>;
+  setFilterCategory: (category: string, userId: string) => void;
+  setSortBy: (sortBy: SortByType, userId: string) => void;
   resetGallery: () => void;
   addPhoto: (photo: Photo) => void;
   toggleLike: (photoId: string, userId: string) => void;
@@ -39,9 +45,23 @@ export const useGalleryStore = create<GalleryState>((set, get) => ({
   page: 0,
   hasMore: true,
   loading: false,
-  resetGallery: () => set({ photos: [], page: 0, hasMore: true }),
+  filterCategory: 'All',
+  sortBy: 'created_at',
+  
+  resetGallery: () => set({ photos: [], page: 0, hasMore: true, filterCategory: 'All', sortBy: 'created_at' }),
+
+  setFilterCategory: (category, userId) => {
+    set({ filterCategory: category, photos: [], page: 0, hasMore: true });
+    get().fetchPhotos(userId);
+  },
+
+  setSortBy: (sortBy, userId) => {
+    set({ sortBy, photos: [], page: 0, hasMore: true });
+    get().fetchPhotos(userId);
+  },
+
   fetchPhotos: async (currentUserId) => {
-    const { loading, hasMore, page } = get();
+    const { loading, hasMore, page, filterCategory, sortBy } = get();
     if (loading || !hasMore) return;
 
     set({ loading: true });
@@ -50,12 +70,17 @@ export const useGalleryStore = create<GalleryState>((set, get) => ({
       const from = page * PHOTOS_PER_PAGE;
       const to = from + PHOTOS_PER_PAGE - 1;
 
-      const { data: photosData, error: photosError } = await supabase
+      let query = supabase
         .from("photos")
-        .select("*, profiles(full_name, avatar_url)")
-        .order("created_at", { ascending: false })
-        .range(from, to);
+        .select("*, profiles(full_name, avatar_url)");
 
+      if (filterCategory !== 'All') {
+        query = query.eq('category', filterCategory);
+      }
+      
+      query = query.order(sortBy, { ascending: false }).range(from, to);
+
+      const { data: photosData, error: photosError } = await query;
       if (photosError) throw photosError;
 
       const { data: likesData, error: likesError } = await supabase

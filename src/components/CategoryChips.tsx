@@ -1,15 +1,14 @@
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
 
-const categories = ["Pookalam", "Attire", "Performances", "Sadhya", "Candid"];
-
 interface CategoryChipsProps {
   value: string;
   onValueChange: (value: string) => void;
   disabled?: boolean;
+  categories: readonly string[];
 }
 
-const CategoryChips = ({ value, onValueChange, disabled }: CategoryChipsProps) => {
+const CategoryChips = ({ value, onValueChange, disabled, categories }: CategoryChipsProps) => {
   return (
     <ToggleGroup
       type="single"
