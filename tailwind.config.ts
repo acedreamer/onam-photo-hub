@@ -99,12 +99,17 @@ export default {
           from: { transform: 'rotate(0deg)' },
           to: { transform: 'rotate(360deg)' },
         },
+        "fade-in": {
+          "from": { opacity: "0", transform: "scale(0.95) translateY(-10px)" },
+          "to": { opacity: "1", transform: "scale(1) translateY(0)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "pulse-slow": "pulse-slow 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         "spin-slow": "spin-slow 20s linear infinite",
+        "fade-in": "fade-in 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards",
       },
     },
   },

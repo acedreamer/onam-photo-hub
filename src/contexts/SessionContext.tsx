@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { showError } from '@/utils/toast';
 
 interface SessionContextValue {
   session: Session | null;
@@ -29,7 +30,18 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
 
     getSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        const userEmail = session.user.email;
+        const allowedDomain = 'cekottarakkara.ac.in';
+        if (userEmail && !userEmail.endsWith(`@${allowedDomain}`)) {
+          supabase.auth.signOut();
+          showError(`Access is restricted to @${allowedDomain} emails.`);
+          setSession(null);
+          setUser(null);
+          return;
+        }
+      }
       setSession(session);
       setUser(session?.user ?? null);
     });

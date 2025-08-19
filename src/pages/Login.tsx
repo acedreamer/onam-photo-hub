@@ -12,19 +12,29 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-ivory">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-2xl shadow-lg">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-dark-leaf-green">Welcome!</h1>
-          <p className="text-neutral-gray mt-2">Sign in to share your Onam moments.</p>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-ivory p-4 overflow-hidden">
+      <div className="relative z-10 w-full max-w-sm animate-fade-in">
+        <div className="text-center mb-8">
+          <img 
+            src="/pookalam-detailed.svg" 
+            alt="Onam Pookalam" 
+            className="w-24 h-24 mx-auto mb-4 animate-spin-slow"
+            onError={(e) => { e.currentTarget.src = '/placeholder.svg'; e.currentTarget.onerror = null; }}
+          />
+          <h1 className="text-3xl font-bold text-dark-leaf-green">Onam Photo Hub</h1>
+          <p className="text-neutral-gray mt-2">
+            Sign in to share your college's Onam moments.
+          </p>
         </div>
-        <Auth
-          supabaseClient={supabase}
-          appearance={{ theme: ThemeSupa }}
-          providers={['google']}
-          theme="light"
-          socialLayout="horizontal"
-        />
+        <div className="p-8 bg-white rounded-2xl shadow-lg">
+          <Auth
+            supabaseClient={supabase}
+            appearance={{ theme: ThemeSupa }}
+            providers={['google']}
+            theme="light"
+            socialLayout="horizontal"
+          />
+        </div>
       </div>
     </div>
   );
