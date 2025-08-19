@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Gallery from "./pages/Gallery";
 import About from "./pages/About";
-import Profile from "./pages/Profile";
+import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import { SessionProvider } from "./contexts/SessionContext";
@@ -27,7 +27,7 @@ const App = () => (
               <Route path="/" element={<Layout />}>
                 <Route index element={<Gallery />} />
                 <Route path="about" element={<About />} />
-                <Route path="profile/:userId" element={<Profile />} />
+                <Route path="profile/:userId" element={<ProfilePage />} />
               </Route>
             </Route>
             <Route path="*" element={<NotFound />} />

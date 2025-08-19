@@ -7,6 +7,7 @@ const PHOTOS_PER_PAGE = 12;
 export type Profile = {
   full_name: string | null;
   avatar_url: string | null;
+  bio: string | null;
 };
 
 export type Photo = {
