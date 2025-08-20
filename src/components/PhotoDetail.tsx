@@ -2,7 +2,7 @@ import type { Photo } from "@/stores/galleryStore";
 import { useGalleryStore } from "@/stores/galleryStore";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Tag, Heart, Trash2, User } from "lucide-react";
+import { Calendar, Tag, Heart, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { useSession } from "@/contexts/SessionContext";
 import { cn } from "@/lib/utils";
@@ -20,6 +20,7 @@ import {
 import { showError } from "@/utils/toast";
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { useState } from "react";
 
 interface PhotoDetailProps {
   photo: Photo;
@@ -29,9 +30,13 @@ interface PhotoDetailProps {
 const PhotoDetail = ({ photo, onClose }: PhotoDetailProps) => {
   const { user, isAdmin } = useSession();
   const { toggleLike, removePhoto } = useGalleryStore();
+  const [isLiking, setIsLiking] = useState(false);
 
   const handleLike = () => {
     if (!user) return;
+    if (!photo.user_has_liked) {
+      setIsLiking(true);
+    }
     toggleLike(photo.id, user.id);
   };
 
@@ -89,10 +94,17 @@ const PhotoDetail = ({ photo, onClose }: PhotoDetailProps) => {
           </span>
         </div>
         <div className="flex items-center space-x-2 pt-2">
-          <Button variant="ghost" size="icon" onClick={handleLike} className="group rounded-full">
+          <Button variant="ghost" size="icon" onClick={handleLike} className="group rounded-full relative">
+            {isLiking && (
+              <div 
+                className="absolute inset-0 rounded-full bg-red-500 animate-like-burst"
+                onAnimationEnd={() => setIsLiking(false)}
+              />
+            )}
             <Heart className={cn(
-              "h-6 w-6 text-gray-500 group-hover:text-red-500 transition-colors",
-              photo.user_has_liked ? "fill-red-500 text-red-500" : "group-hover:fill-red-500"
+              "h-6 w-6 text-gray-500 group-hover:text-red-500 transition-colors z-10",
+              photo.user_has_liked ? "fill-red-500 text-red-500" : "group-hover:fill-red-500",
+              isLiking && "animate-like-pop"
             )} />
           </Button>
           <span className="text-base font-medium text-neutral-gray">

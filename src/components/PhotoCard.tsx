@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -29,10 +30,15 @@ const PhotoCard = ({ photo }: PhotoCardProps) => {
   const { user, isAdmin } = useSession();
   const toggleLike = useGalleryStore((state) => state.toggleLike);
   const removePhoto = useGalleryStore((state) => state.removePhoto);
+  const [isLiking, setIsLiking] = useState(false);
 
   const handleLikeClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!user) return;
+
+    if (!photo.user_has_liked) {
+      setIsLiking(true);
+    }
     toggleLike(photo.id, user.id);
   };
 
@@ -50,7 +56,7 @@ const PhotoCard = ({ photo }: PhotoCardProps) => {
   const uploaderInitial = uploaderName.charAt(0).toUpperCase();
 
   return (
-    <Card className="overflow-hidden break-inside-avoid rounded-2xl shadow-md flex flex-col transition-transform duration-300 ease-in-out hover:scale-[1.02] hover:shadow-xl">
+    <Card className="overflow-hidden break-inside-avoid rounded-2xl shadow-md flex flex-col transition-all duration-300 ease-in-out hover:shadow-xl hover:shadow-bright-gold/20 hover:-translate-y-1">
       <CardContent className="p-0 relative">
         <img
           src={photo.image_url}
@@ -103,10 +109,17 @@ const PhotoCard = ({ photo }: PhotoCardProps) => {
           </div>
         </Link>
         <div className="flex items-center space-x-1 shrink-0">
-            <Button variant="ghost" size="icon" className="h-8 w-8 group" onClick={handleLikeClick}>
+            <Button variant="ghost" size="icon" className="h-8 w-8 group relative" onClick={handleLikeClick}>
+                {isLiking && (
+                  <div 
+                    className="absolute inset-0 rounded-full bg-red-500 animate-like-burst"
+                    onAnimationEnd={() => setIsLiking(false)}
+                  />
+                )}
                 <Heart className={cn(
-                  "h-5 w-5 text-gray-400 group-hover:text-red-500 transition-colors",
-                  photo.user_has_liked ? "fill-red-500 text-red-500" : "group-hover:fill-red-500"
+                  "h-5 w-5 text-gray-400 group-hover:text-red-500 transition-colors z-10",
+                  photo.user_has_liked ? "fill-red-500 text-red-500" : "group-hover:fill-red-500",
+                  isLiking && "animate-like-pop"
                 )} />
             </Button>
             {photo.likes > 0 && (

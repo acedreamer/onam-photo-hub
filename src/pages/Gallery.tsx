@@ -116,7 +116,8 @@ const Gallery = () => {
               <div 
                 key={photo.id} 
                 ref={index === photos.length - 1 ? lastPhotoElementRef : null}
-                className="cursor-pointer" 
+                className="cursor-pointer animate-fade-in-up" 
+                style={{ animationDelay: `${Math.min(index * 75, 1000)}ms` }}
                 onClick={() => setSelectedPhoto(photo)}
               >
                 <PhotoCard photo={photo} />
