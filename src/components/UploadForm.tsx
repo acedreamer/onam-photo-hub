@@ -13,6 +13,8 @@ interface UploadFormProps {
   onUploadComplete: () => void;
 }
 
+const uploadCategories = ["Pookalam", "Attire", "Performances", "Sadhya", "Candid"] as const;
+
 const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
@@ -165,6 +167,7 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
       <div>
         <p className="text-sm font-medium text-neutral-gray mb-2 text-center">Select a category</p>
         <CategoryChips 
+          categories={uploadCategories}
           value={category}
           onValueChange={setCategory}
           disabled={previews.length === 0}
