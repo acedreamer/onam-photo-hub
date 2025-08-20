@@ -52,7 +52,15 @@ const SignUp = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-ivory p-4 overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 overflow-hidden relative">
+      <div className="absolute inset-0 z-0 opacity-5 dark:opacity-[0.02]">
+        <img 
+          src="/pookalam-detailed.svg" 
+          alt="" 
+          className="w-full h-full object-cover blur-sm scale-125"
+          aria-hidden="true"
+        />
+      </div>
       <div className="relative z-10 w-full max-w-sm animate-fade-in">
         <div className="text-center mb-8">
           <img 
@@ -61,13 +69,13 @@ const SignUp = () => {
             className="w-24 h-24 mx-auto mb-4 animate-spin-slow"
             onError={(e) => { e.currentTarget.src = '/placeholder.svg'; e.currentTarget.onerror = null; }}
           />
-          <h1 className="text-3xl font-bold text-dark-leaf-green font-serif">Create Your Account</h1>
-          <p className="text-neutral-gray mt-2">
+          <h1 className="text-3xl font-bold text-foreground font-serif">Create Your Account</h1>
+          <p className="text-muted-foreground mt-2">
             Join the celebration and share your moments.
           </p>
         </div>
         
-        <div className="p-8 bg-white rounded-2xl shadow-lg">
+        <div className="p-8 bg-card rounded-2xl shadow-lg border dark:border-bright-gold/20">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
@@ -75,7 +83,7 @@ const SignUp = () => {
                 name="fullName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-neutral-gray">Full Name</FormLabel>
+                    <FormLabel className="text-muted-foreground">Full Name</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -91,7 +99,7 @@ const SignUp = () => {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-neutral-gray">Email</FormLabel>
+                    <FormLabel className="text-muted-foreground">Email</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -107,7 +115,7 @@ const SignUp = () => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-neutral-gray">Password</FormLabel>
+                    <FormLabel className="text-muted-foreground">Password</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -120,7 +128,7 @@ const SignUp = () => {
                         <button 
                           type="button" 
                           onClick={() => setShowPassword(!showPassword)} 
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-dark-leaf-green"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary"
                           aria-label={showPassword ? "Hide password" : "Show password"}
                         >
                           {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -133,7 +141,7 @@ const SignUp = () => {
               />
               <Button 
                 type="submit" 
-                className="w-full bg-dark-leaf-green text-white hover:bg-bright-gold hover:text-dark-leaf-green transition-all duration-300 ease-in-out transform hover:scale-105 shadow-md hover:shadow-lg"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-md hover:shadow-lg"
                 disabled={loading}
               >
                 {loading ? "Creating Account..." : "Sign Up"}
@@ -141,9 +149,9 @@ const SignUp = () => {
             </form>
           </Form>
         </div>
-        <p className="mt-6 text-center text-sm text-neutral-gray">
+        <p className="mt-6 text-center text-sm text-muted-foreground">
           Already have an account?{' '}
-          <Link to="/login" className="font-semibold text-dark-leaf-green hover:underline">
+          <Link to="/login" className="font-semibold text-primary hover:underline">
             Sign in
           </Link>
         </p>

@@ -13,7 +13,7 @@ const BottomNav = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 h-20 bg-ivory border-t border-gray-200/80 flex justify-around items-center z-40">
+    <nav className="fixed bottom-0 left-0 right-0 h-20 bg-background border-t border-border/80 flex justify-around items-center z-40">
       {navItems.map((item) => (
         <NavLink
           key={item.href}
@@ -21,8 +21,8 @@ const BottomNav = () => {
           end={item.href === "/"}
           className={({ isActive }) =>
             cn(
-              "flex flex-col items-center justify-center w-full h-full text-gray-500 transition-colors",
-              isActive ? "text-dark-leaf-green" : "hover:text-dark-leaf-green/70"
+              "flex flex-col items-center justify-center w-full h-full text-muted-foreground transition-colors",
+              isActive ? "text-primary" : "hover:text-primary/70"
             )
           }
         >

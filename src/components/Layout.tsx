@@ -8,7 +8,7 @@ const Layout = () => {
   const showFab = location.pathname === '/' || location.pathname.startsWith('/profile');
 
   return (
-    <div className="min-h-screen bg-ivory font-sans">
+    <div className="min-h-screen bg-background font-sans">
       <Header />
       <main className="pb-28 pt-20 px-4">
         <Outlet />
