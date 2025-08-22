@@ -32,6 +32,14 @@ const SignUp = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
+    
+    // Check if email belongs to the allowed domain
+    if (!values.email.endsWith('@cekottarakkara.ac.in')) {
+      showError("Access restricted to @cekottarakkara.ac.in email addresses only.");
+      setLoading(false);
+      return;
+    }
+    
     const { error } = await supabase.auth.signUp({
       email: values.email,
       password: values.password,
@@ -73,6 +81,11 @@ const SignUp = () => {
           <p className="text-muted-foreground mt-2">
             Join the celebration and share your moments.
           </p>
+          <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+            <p className="text-sm text-amber-800">
+              <span className="font-semibold">Note:</span> Only @cekottarakkara.ac.in email addresses are allowed for registration.
+            </p>
+          </div>
         </div>
         
         <div className="p-8 bg-card rounded-2xl shadow-lg border dark:border-bright-gold/20">
@@ -87,7 +100,7 @@ const SignUp = () => {
                     <FormControl>
                       <div className="relative">
                         <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                        <Input placeholder="Your full name" {...field} className="pl-10" />
+                        <Input placeholder="Your full name" {...field} className="pl-10 input-field" />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -103,9 +116,16 @@ const SignUp = () => {
                     <FormControl>
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                        <Input placeholder="your.email@provider.com" {...field} className="pl-10" />
+                        <Input 
+                          placeholder="yourname@cekottarakkara.ac.in" 
+                          {...field} 
+                          className="pl-10 input-field" 
+                        />
                       </div>
                     </FormControl>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Only @cekottarakkara.ac.in emails are allowed
+                    </p>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -123,7 +143,7 @@ const SignUp = () => {
                           type={showPassword ? "text" : "password"}
                           placeholder="••••••••" 
                           {...field} 
-                          className="pl-10 pr-10"
+                          className="pl-10 pr-10 input-field"
                         />
                         <button 
                           type="button" 
@@ -141,7 +161,7 @@ const SignUp = () => {
               />
               <Button 
                 type="submit" 
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-md hover:shadow-lg"
+                className="w-full btn-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-md hover:shadow-lg"
                 disabled={loading}
               >
                 {loading ? "Creating Account..." : "Sign Up"}

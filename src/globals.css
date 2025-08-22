@@ -75,3 +75,44 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Enhanced light mode styles */
+.bg-card {
+  background: linear-gradient(145deg, hsl(0 0% 100%), hsl(60 10% 98%));
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.border {
+  border-color: hsl(60 10% 91%);
+}
+
+.text-foreground {
+  color: hsl(0 0% 15%);
+}
+
+.text-muted-foreground {
+  color: hsl(0 0% 40%);
+}
+
+/* Enhanced button styles for light mode */
+.btn-primary {
+  background: linear-gradient(135deg, hsl(120 100% 25%), hsl(120 100% 20%));
+  box-shadow: 0 4px 6px rgba(34, 139, 34, 0.2);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, hsl(120 100% 20%), hsl(120 100% 15%));
+  box-shadow: 0 6px 8px rgba(34, 139, 34, 0.3);
+}
+
+/* Enhanced input styles */
+.input-field {
+  background: hsl(0 0% 100%);
+  border: 1px solid hsl(60 10% 85%);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.input-field:focus {
+  border-color: hsl(120 100% 20%);
+  box-shadow: 0 0 0 3px rgba(34, 139, 34, 0.1);
+}

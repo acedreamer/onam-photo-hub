@@ -29,14 +29,16 @@ const Login = () => {
     },
   });
 
-  const handleGoogleLogin = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-    });
-  };
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
+    
+    // Check if email belongs to the allowed domain
+    if (!values.email.endsWith('@cekottarakkara.ac.in')) {
+      showError("Access restricted to @cekottarakkara.ac.in email addresses only.");
+      setLoading(false);
+      return;
+    }
+    
     const { error } = await supabase.auth.signInWithPassword({
       email: values.email,
       password: values.password,
@@ -88,9 +90,16 @@ const Login = () => {
                     <FormControl>
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                        <Input placeholder="your.email@provider.com" {...field} className="pl-10" />
+                        <Input 
+                          placeholder="yourname@cekottarakkara.ac.in" 
+                          {...field} 
+                          className="pl-10 input-field" 
+                        />
                       </div>
                     </FormControl>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Only @cekottarakkara.ac.in emails are allowed
+                    </p>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -108,7 +117,7 @@ const Login = () => {
                           type={showPassword ? "text" : "password"}
                           placeholder="••••••••" 
                           {...field} 
-                          className="pl-10 pr-10"
+                          className="pl-10 pr-10 input-field"
                         />
                         <button 
                           type="button" 
@@ -126,32 +135,13 @@ const Login = () => {
               />
               <Button 
                 type="submit" 
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-md hover:shadow-lg"
+                className="w-full btn-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-md hover:shadow-lg"
                 disabled={loading}
               >
                 {loading ? "Signing In..." : "Sign In"}
               </Button>
             </form>
           </Form>
-
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
-            </div>
-          </div>
-
-          <Button 
-            variant="outline" 
-            className="w-full" 
-            onClick={handleGoogleLogin}
-            disabled={loading}
-          >
-            <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 126 23.4 172.9 61.9l-76.2 76.2C322.3 103.6 289.4 88 248 88c-73.2 0-133.1 59.9-133.1 133.1s59.9 133.1 133.1 133.1c76.9 0 115.1-53.2 120.2-79.2H248v-62h239.5c3.3 15.2 4.8 31.4 4.8 47.8z"></path></svg>
-            Google
-          </Button>
         </div>
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Don't have an account?{' '}
