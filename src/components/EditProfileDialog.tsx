@@ -23,7 +23,7 @@ interface EditProfileDialogProps {
   profile: Profile;
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  onProfileUpdate: (updatedProfile: Profile) => void;
+  onProfileUpdate: () => void;
 }
 
 const EditProfileDialog = ({ profile, isOpen, onOpenChange, onProfileUpdate }: EditProfileDialogProps) => {
@@ -72,7 +72,7 @@ const EditProfileDialog = ({ profile, isOpen, onOpenChange, onProfileUpdate }: E
         newAvatarUrl = uploadData.secure_url;
       }
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('profiles')
         .update({
           full_name: values.full_name,
@@ -86,7 +86,7 @@ const EditProfileDialog = ({ profile, isOpen, onOpenChange, onProfileUpdate }: E
 
       if (error) throw error;
 
-      onProfileUpdate(data);
+      onProfileUpdate();
       showSuccess('Profile updated successfully!');
       onOpenChange(false);
     } catch (error: any) {

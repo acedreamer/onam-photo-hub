@@ -11,7 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Loader2, Edit } from 'lucide-react';
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 import { VirtuosoGrid } from 'react-virtuoso';
 
 const PHOTOS_PER_PAGE = 12;
@@ -43,7 +43,8 @@ const fetchProfilePhotosPage = async ({ pageParam = 0, userId, currentUserId }: 
 const ProfilePage = () => {
   const { userId } = useParams<{ userId: string }>();
   const { user: currentUser } = useSession();
-  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
+  const queryClient = useQueryClient();
+  const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const { data: profile, isLoading: isLoadingProfile, refetch: refetchProfile } = useQuery({
@@ -77,6 +78,7 @@ const ProfilePage = () => {
   });
 
   const photos = photosData?.pages.flatMap(page => page.data) ?? [];
+  const selectedPhoto = photos.find(p => p.id === selectedPhotoId) ?? null;
 
   const loadMore = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -146,7 +148,7 @@ const ProfilePage = () => {
                   <div
                     key={photo.id}
                     className="cursor-pointer"
-                    onClick={() => setSelectedPhoto(photo)}
+                    onClick={() => setSelectedPhotoId(photo.id)}
                   >
                     <PhotoCard photo={photo} />
                   </div>
@@ -158,9 +160,9 @@ const ProfilePage = () => {
         )}
       </div>
 
-      <Dialog open={!!selectedPhoto} onOpenChange={(isOpen) => !isOpen && setSelectedPhoto(null)}>
+      <Dialog open={!!selectedPhoto} onOpenChange={(isOpen) => !isOpen && setSelectedPhotoId(null)}>
         <DialogContent className="max-w-4xl bg-ivory">
-          {selectedPhoto && <PhotoDetail photo={selectedPhoto} onClose={() => setSelectedPhoto(null)} />}
+          {selectedPhoto && <PhotoDetail photo={selectedPhoto} onClose={() => setSelectedPhotoId(null)} />}
         </DialogContent>
       </Dialog>
 
@@ -169,7 +171,10 @@ const ProfilePage = () => {
           profile={profile}
           isOpen={isEditDialogOpen}
           onOpenChange={setIsEditDialogOpen}
-          onProfileUpdate={() => refetchProfile()}
+          onProfileUpdate={() => {
+            refetchProfile();
+            queryClient.invalidateQueries({ queryKey: ['photos', 'profile', userId] });
+          }}
         />
       )}
     </>

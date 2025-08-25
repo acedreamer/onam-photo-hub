@@ -47,7 +47,7 @@ const fetchPhotosPage = async ({ pageParam = 0, queryKey, userId }: any) => {
 
 const Gallery = () => {
   const { filterCategory, sortBy, setFilterCategory, setSortBy } = useGalleryStore();
-  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
+  const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null);
   const { user } = useSession();
 
   const {
@@ -64,6 +64,7 @@ const Gallery = () => {
   });
 
   const photos = data?.pages.flatMap(page => page.data) ?? [];
+  const selectedPhoto = photos.find(p => p.id === selectedPhotoId) ?? null;
 
   const loadMore = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -149,7 +150,7 @@ const Gallery = () => {
                   <div
                     key={photo.id}
                     className="cursor-pointer"
-                    onClick={() => setSelectedPhoto(photo)}
+                    onClick={() => setSelectedPhotoId(photo.id)}
                   >
                     <PhotoCard photo={photo} />
                   </div>
@@ -161,7 +162,7 @@ const Gallery = () => {
         )}
       </div>
 
-      <Dialog open={!!selectedPhoto} onOpenChange={(isOpen) => !isOpen && setSelectedPhoto(null)}>
+      <Dialog open={!!selectedPhoto} onOpenChange={(isOpen) => !isOpen && setSelectedPhotoId(null)}>
         <DialogContent className="max-w-4xl bg-background">
           {selectedPhoto && (
             <>
@@ -171,7 +172,7 @@ const Gallery = () => {
                   {selectedPhoto.caption || `An Onam celebration photo in the ${selectedPhoto.category} category.`}
                 </DialogDescription>
               </DialogHeader>
-              <PhotoDetail photo={selectedPhoto} onClose={() => setSelectedPhoto(null)} />
+              <PhotoDetail photo={selectedPhoto} onClose={() => setSelectedPhotoId(null)} />
             </>
           )}
         </DialogContent>
