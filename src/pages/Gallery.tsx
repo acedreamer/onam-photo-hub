@@ -138,24 +138,26 @@ const Gallery = () => {
             <p className="text-muted-foreground mt-2">Be the first to share a vibrant Onam moment.</p>
           </div>
         ) : (
-          <VirtuosoGrid
-            totalCount={photos.length}
-            endReached={loadMore}
-            components={{ Footer: GalleryFooter }}
-            itemContent={index => {
-              const photo = photos[index];
-              return (
-                <div
-                  key={photo.id}
-                  className="cursor-pointer"
-                  onClick={() => setSelectedPhoto(photo)}
-                >
-                  <PhotoCard photo={photo} />
-                </div>
-              );
-            }}
-            listClassName="grid grid-cols-2 sm:grid-cols-3 gap-4"
-          />
+          <div style={{ height: '70vh' }}>
+            <VirtuosoGrid
+              totalCount={photos.length}
+              endReached={loadMore}
+              components={{ Footer: GalleryFooter }}
+              itemContent={index => {
+                const photo = photos[index];
+                return (
+                  <div
+                    key={photo.id}
+                    className="cursor-pointer"
+                    onClick={() => setSelectedPhoto(photo)}
+                  >
+                    <PhotoCard photo={photo} />
+                  </div>
+                );
+              }}
+              listClassName="grid grid-cols-2 sm:grid-cols-3 gap-4"
+            />
+          </div>
         )}
       </div>
 

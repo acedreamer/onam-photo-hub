@@ -132,24 +132,26 @@ const ProfilePage = () => {
         {photos.length === 0 && !isLoadingPhotos ? (
           <p className="text-center text-neutral-gray pt-8">This user hasn't shared any photos yet.</p>
         ) : (
-          <VirtuosoGrid
-            totalCount={photos.length}
-            endReached={loadMore}
-            components={{ Footer: ProfileFooter }}
-            itemContent={index => {
-              const photo = photos[index];
-              return (
-                <div
-                  key={photo.id}
-                  className="cursor-pointer"
-                  onClick={() => setSelectedPhoto(photo)}
-                >
-                  <PhotoCard photo={photo} />
-                </div>
-              );
-            }}
-            listClassName="grid grid-cols-2 sm:grid-cols-3 gap-4"
-          />
+          <div style={{ height: '70vh' }}>
+            <VirtuosoGrid
+              totalCount={photos.length}
+              endReached={loadMore}
+              components={{ Footer: ProfileFooter }}
+              itemContent={index => {
+                const photo = photos[index];
+                return (
+                  <div
+                    key={photo.id}
+                    className="cursor-pointer"
+                    onClick={() => setSelectedPhoto(photo)}
+                  >
+                    <PhotoCard photo={photo} />
+                  </div>
+                );
+              }}
+              listClassName="grid grid-cols-2 sm:grid-cols-3 gap-4"
+            />
+          </div>
         )}
       </div>
 
