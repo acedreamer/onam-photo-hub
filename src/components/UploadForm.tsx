@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useQueryClient } from "@tanstack/react-query";
+import { DrawerHeader, DrawerTitle, DrawerDescription } from "@/components/ui/drawer";
 
 interface UploadFormProps {
   onUploadComplete: () => void;
@@ -119,88 +120,90 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
   }, [previews]);
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 space-y-4">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-dark-leaf-green">Share Your Moments</h2>
-      </div>
-      
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        accept="image/*"
-        className="hidden"
-        multiple
-      />
+    <>
+      <DrawerHeader>
+        <DrawerTitle className="text-dark-leaf-green">Share Your Moments</DrawerTitle>
+        <DrawerDescription>Select your photos, add a caption, and choose a category.</DrawerDescription>
+      </DrawerHeader>
+      <form onSubmit={handleSubmit} className="p-4 pt-0 space-y-4">
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          accept="image/*"
+          className="hidden"
+          multiple
+        />
 
-      {previews.length > 0 ? (
-        <div className="relative">
-          <div className="grid grid-cols-3 gap-2 w-full aspect-square rounded-lg overflow-y-auto border-2 border-dashed border-gray-300 p-2">
-            {previews.map((src, index) => (
-              <div key={index} className="relative aspect-square">
-                <img src={src} alt={`Preview ${index + 1}`} className="w-full h-full object-cover rounded-md" />
-              </div>
-            ))}
+        {previews.length > 0 ? (
+          <div className="relative">
+            <div className="grid grid-cols-3 gap-2 w-full aspect-square rounded-lg overflow-y-auto border-2 border-dashed border-gray-300 p-2">
+              {previews.map((src, index) => (
+                <div key={index} className="relative aspect-square">
+                  <img src={src} alt={`Preview ${index + 1}`} className="w-full h-full object-cover rounded-md" />
+                </div>
+              ))}
+            </div>
+            <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-8 w-8" onClick={resetSelection}>
+              <X className="h-4 w-4" />
+            </Button>
           </div>
-          <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-8 w-8" onClick={resetSelection}>
-            <X className="h-4 w-4" />
-          </Button>
+        ) : (
+          <div 
+            className="w-full aspect-square rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-500 cursor-pointer hover:bg-gray-50 transition-colors"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <ImageUp className="h-12 w-12 mb-2" />
+            <span className="font-medium">Click to select photos</span>
+          </div>
+        )}
+
+        <Textarea
+          placeholder="Add a caption for all photos... (optional)"
+          value={caption}
+          onChange={(e) => setCaption(e.target.value)}
+          className="resize-none"
+          disabled={previews.length === 0}
+        />
+
+        <div>
+          <p className="text-sm font-medium text-neutral-gray mb-2 text-center">Select a category</p>
+          <CategoryChips 
+            categories={uploadCategories}
+            value={category}
+            onValueChange={setCategory}
+            disabled={previews.length === 0}
+          />
         </div>
-      ) : (
-        <div 
-          className="w-full aspect-square rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-500 cursor-pointer hover:bg-gray-50 transition-colors"
-          onClick={() => fileInputRef.current?.click()}
+
+        <div className="flex items-center space-x-2 justify-center">
+          <Checkbox 
+            id="allow-download" 
+            checked={allowDownload}
+            onCheckedChange={(checked) => setAllowDownload(Boolean(checked))}
+            disabled={previews.length === 0}
+          />
+          <Label htmlFor="allow-download" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+            Allow others to download this photo
+          </Label>
+        </div>
+
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        <Button 
+          type="submit" 
+          className="w-full bg-dark-leaf-green hover:bg-dark-leaf-green/90" 
+          disabled={isUploading || files.length === 0 || !category}
         >
-          <ImageUp className="h-12 w-12 mb-2" />
-          <span className="font-medium">Click to select photos</span>
-        </div>
-      )}
-
-      <Textarea
-        placeholder="Add a caption for all photos... (optional)"
-        value={caption}
-        onChange={(e) => setCaption(e.target.value)}
-        className="resize-none"
-        disabled={previews.length === 0}
-      />
-
-      <div>
-        <p className="text-sm font-medium text-neutral-gray mb-2 text-center">Select a category</p>
-        <CategoryChips 
-          categories={uploadCategories}
-          value={category}
-          onValueChange={setCategory}
-          disabled={previews.length === 0}
-        />
-      </div>
-
-      <div className="flex items-center space-x-2 justify-center">
-        <Checkbox 
-          id="allow-download" 
-          checked={allowDownload}
-          onCheckedChange={(checked) => setAllowDownload(Boolean(checked))}
-          disabled={previews.length === 0}
-        />
-        <Label htmlFor="allow-download" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-          Allow others to download this photo
-        </Label>
-      </div>
-
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      <Button 
-        type="submit" 
-        className="w-full bg-dark-leaf-green hover:bg-dark-leaf-green/90" 
-        disabled={isUploading || files.length === 0 || !category}
-      >
-        {isUploading ? "Sharing..." : `Share ${files.length} Photo${files.length > 1 ? 's' : ''}`}
-        {!isUploading && <Upload className="h-4 w-4 ml-2" />}
-      </Button>
-    </form>
+          {isUploading ? "Sharing..." : `Share ${files.length} Photo${files.length > 1 ? 's' : ''}`}
+          {!isUploading && <Upload className="h-4 w-4 ml-2" />}
+        </Button>
+      </form>
+    </>
   );
 };
 
