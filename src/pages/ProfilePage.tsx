@@ -92,7 +92,7 @@ const ProfilePage = () => {
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-4 w-64" />
         </div>
-        <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-40 w-full rounded-2xl" />)}
         </div>
       </div>
@@ -106,7 +106,7 @@ const ProfilePage = () => {
   const ProfileFooter = () => {
     if (!isFetchingNextPage) return null;
     return (
-      <div className="flex justify-center items-center p-8 col-span-3 sm:col-span-4">
+      <div className="flex justify-center items-center p-8 col-span-2 sm:col-span-3 md:col-span-4">
         <Loader2 className="h-8 w-8 animate-spin text-dark-leaf-green" />
       </div>
     );
@@ -135,7 +135,7 @@ const ProfilePage = () => {
         {photos.length === 0 && !isLoadingPhotos ? (
           <p className="text-center text-neutral-gray pt-8">This user hasn't shared any photos yet.</p>
         ) : (
-          <div style={{ height: '70vh' }}>
+          <div style={{ height: '60vh' }}>
             <VirtuosoGrid
               totalCount={photos.length}
               endReached={loadMore}
@@ -152,7 +152,7 @@ const ProfilePage = () => {
                   </div>
                 );
               }}
-              listClassName="grid grid-cols-3 sm:grid-cols-4 gap-4"
+              listClassName="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
             />
           </div>
         )}
