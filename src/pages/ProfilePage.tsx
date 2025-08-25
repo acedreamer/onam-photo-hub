@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import type { Photo, Profile } from '@/stores/galleryStore';
@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Loader2, Edit } from 'lucide-react';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { VirtuosoGrid } from 'react-virtuoso';
 
 const PHOTOS_PER_PAGE = 12;
 
@@ -74,19 +75,13 @@ const ProfilePage = () => {
 
   const photos = photosData?.pages.flatMap(page => page.data) ?? [];
 
-  const observer = useRef<IntersectionObserver>();
-  const lastPhotoElementRef = useCallback((node: HTMLDivElement) => {
-    if (isFetchingNextPage) return;
-    if (observer.current) observer.current.disconnect();
-    observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasNextPage) {
-        fetchNextPage();
-      }
-    });
-    if (node) observer.current.observe(node);
-  }, [isFetchingNextPage, hasNextPage, fetchNextPage]);
+  const loadMore = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  if (isLoadingProfile || isLoadingPhotos) {
+  if (isLoadingProfile || isLoadingPhotos && !photos.length) {
     return (
       <div className="space-y-8">
         <div className="flex flex-col items-center space-y-4">
@@ -94,7 +89,7 @@ const ProfilePage = () => {
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-4 w-64" />
         </div>
-        <div className="columns-2 sm:columns-3 gap-4 space-y-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-40 w-full rounded-2xl" />)}
         </div>
       </div>
@@ -104,6 +99,15 @@ const ProfilePage = () => {
   const uploaderName = profile?.full_name || "Anonymous";
   const uploaderInitial = uploaderName.charAt(0).toUpperCase();
   const isOwnProfile = currentUser?.id === userId;
+
+  const ProfileFooter = () => {
+    if (!isFetchingNextPage) return null;
+    return (
+      <div className="flex justify-center items-center p-8 col-span-2 sm:col-span-3">
+        <Loader2 className="h-8 w-8 animate-spin text-dark-leaf-green" />
+      </div>
+    );
+  };
 
   return (
     <>
@@ -125,27 +129,27 @@ const ProfilePage = () => {
           )}
         </div>
 
-        {photos.length === 0 ? (
+        {photos.length === 0 && !isLoadingPhotos ? (
           <p className="text-center text-neutral-gray pt-8">This user hasn't shared any photos yet.</p>
         ) : (
-          <div className="columns-2 sm:columns-3 gap-4 space-y-4">
-            {photos.map((photo, index) => (
-              <div
-                key={photo.id}
-                ref={index === photos.length - 1 ? lastPhotoElementRef : null}
-                className="cursor-pointer animate-fade-in-up"
-                style={{ animationDelay: `${Math.min(index * 75, 1000)}ms` }}
-                onClick={() => setSelectedPhoto(photo)}
-              >
-                <PhotoCard photo={photo} />
-              </div>
-            ))}
-          </div>
-        )}
-        {isFetchingNextPage && (
-          <div className="flex justify-center items-center mt-8">
-            <Loader2 className="h-8 w-8 animate-spin text-dark-leaf-green" />
-          </div>
+          <VirtuosoGrid
+            totalCount={photos.length}
+            endReached={loadMore}
+            components={{ Footer: ProfileFooter }}
+            itemContent={index => {
+              const photo = photos[index];
+              return (
+                <div
+                  key={photo.id}
+                  className="cursor-pointer"
+                  onClick={() => setSelectedPhoto(photo)}
+                >
+                  <PhotoCard photo={photo} />
+                </div>
+              );
+            }}
+            listClassName="grid grid-cols-2 sm:grid-cols-3 gap-4"
+          />
         )}
       </div>
 

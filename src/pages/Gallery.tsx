@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { useGalleryStore, type Photo } from "@/stores/galleryStore";
 import PhotoCard from "@/components/PhotoCard";
 import PhotoDetail from "@/components/PhotoDetail";
@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Loader2, Sparkles, TrendingUp } from "lucide-react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { VirtuosoGrid } from 'react-virtuoso';
 
 const categories = ["All", "Pookalam", "Attire", "Performances", "Sadhya", "Candid"] as const;
 const PHOTOS_PER_PAGE = 12;
@@ -64,17 +65,11 @@ const Gallery = () => {
 
   const photos = data?.pages.flatMap(page => page.data) ?? [];
 
-  const observer = useRef<IntersectionObserver>();
-  const lastPhotoElementRef = useCallback((node: HTMLDivElement) => {
-    if (isFetchingNextPage) return;
-    if (observer.current) observer.current.disconnect();
-    observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasNextPage) {
-        fetchNextPage();
-      }
-    });
-    if (node) observer.current.observe(node);
-  }, [isFetchingNextPage, hasNextPage, fetchNextPage]);
+  const loadMore = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleFilterChange = (value: string) => {
     if (value) setFilterCategory(value);
@@ -82,6 +77,15 @@ const Gallery = () => {
 
   const handleSortChange = (value: 'created_at' | 'likes') => {
     if (value) setSortBy(value);
+  };
+
+  const GalleryFooter = () => {
+    if (!isFetchingNextPage) return null;
+    return (
+      <div className="flex justify-center items-center p-8 col-span-2 sm:col-span-3">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
   };
 
   return (
@@ -113,7 +117,7 @@ const Gallery = () => {
         </div>
         
         {isLoading ? (
-          <div className="columns-2 sm:columns-3 gap-4 space-y-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {Array.from({ length: 9 }).map((_, i) => (
               <div key={i} className="break-inside-avoid">
                 <Skeleton className="w-full h-40 rounded-2xl" />
@@ -134,24 +138,24 @@ const Gallery = () => {
             <p className="text-muted-foreground mt-2">Be the first to share a vibrant Onam moment.</p>
           </div>
         ) : (
-          <div className="columns-2 sm:columns-3 gap-4 space-y-4">
-            {photos.map((photo, index) => (
-              <div 
-                key={photo.id} 
-                ref={index === photos.length - 1 ? lastPhotoElementRef : null}
-                className="cursor-pointer animate-fade-in-up" 
-                style={{ animationDelay: `${Math.min(index * 75, 1000)}ms` }}
-                onClick={() => setSelectedPhoto(photo)}
-              >
-                <PhotoCard photo={photo} />
-              </div>
-            ))}
-          </div>
-        )}
-        {isFetchingNextPage && (
-          <div className="flex justify-center items-center mt-8">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
+          <VirtuosoGrid
+            totalCount={photos.length}
+            endReached={loadMore}
+            components={{ Footer: GalleryFooter }}
+            itemContent={index => {
+              const photo = photos[index];
+              return (
+                <div
+                  key={photo.id}
+                  className="cursor-pointer"
+                  onClick={() => setSelectedPhoto(photo)}
+                >
+                  <PhotoCard photo={photo} />
+                </div>
+              );
+            }}
+            listClassName="grid grid-cols-2 sm:grid-cols-3 gap-4"
+          />
         )}
       </div>
 
