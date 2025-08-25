@@ -21,6 +21,7 @@ import {
 import { showError } from "@/utils/toast";
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import OptimizedImage from "./OptimizedImage";
 
 interface PhotoCardProps {
   photo: Photo;
@@ -31,16 +32,6 @@ const PhotoCard = ({ photo }: PhotoCardProps) => {
   const toggleLike = useGalleryStore((state) => state.toggleLike);
   const removePhoto = useGalleryStore((state) => state.removePhoto);
   const [isLiking, setIsLiking] = useState(false);
-
-  const getThumbnailUrl = (imageUrl: string) => {
-    if (!imageUrl.includes('/upload/')) {
-      return imageUrl;
-    }
-    const parts = imageUrl.split('/upload/');
-    // Transformation: width 400px, auto quality, auto format
-    const transformation = 'w_400,q_auto,f_auto';
-    return `${parts[0]}/upload/${transformation}/${parts[1]}`;
-  };
 
   const handleLikeClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -68,11 +59,10 @@ const PhotoCard = ({ photo }: PhotoCardProps) => {
   return (
     <Card className="overflow-hidden break-inside-avoid rounded-2xl shadow-md flex flex-col transition-all duration-300 ease-in-out hover:shadow-xl hover:shadow-bright-gold/20 hover:-translate-y-1">
       <CardContent className="p-0 relative">
-        <img
-          src={getThumbnailUrl(photo.image_url)}
+        <OptimizedImage
+          imageUrl={photo.image_url}
           alt={photo.caption || 'Onam photo'}
-          className="w-full h-auto object-cover"
-          onContextMenu={(e) => e.preventDefault()}
+          className="aspect-[3/4]"
         />
         <Badge className="absolute top-3 right-3 bg-bright-gold text-dark-leaf-green pointer-events-none">
           {photo.category}
