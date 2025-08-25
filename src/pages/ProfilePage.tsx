@@ -168,20 +168,22 @@ const ProfilePage = () => {
         )}
       </div>
 
-      {isMobile ? (
-        <Drawer open={!!selectedPhoto} onOpenChange={(isOpen) => !isOpen && setSelectedPhotoId(null)}>
-          <DrawerContent className="bg-ivory">
-            <div className="max-h-[85vh] overflow-y-auto">
+      {isMobile !== null && (
+        isMobile ? (
+          <Drawer open={!!selectedPhoto} onOpenChange={(isOpen) => !isOpen && setSelectedPhotoId(null)}>
+            <DrawerContent className="bg-ivory">
+              <div className="max-h-[85vh] overflow-y-auto">
+                <PhotoDetailView />
+              </div>
+            </DrawerContent>
+          </Drawer>
+        ) : (
+          <Dialog open={!!selectedPhoto} onOpenChange={(isOpen) => !isOpen && setSelectedPhotoId(null)}>
+            <DialogContent className="max-w-4xl bg-ivory">
               <PhotoDetailView />
-            </div>
-          </DrawerContent>
-        </Drawer>
-      ) : (
-        <Dialog open={!!selectedPhoto} onOpenChange={(isOpen) => !isOpen && setSelectedPhotoId(null)}>
-          <DialogContent className="max-w-4xl bg-ivory">
-            <PhotoDetailView />
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        )
       )}
 
       {isOwnProfile && profile && (

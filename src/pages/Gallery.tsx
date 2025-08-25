@@ -166,30 +166,32 @@ const Gallery = () => {
         )}
       </div>
 
-      {isMobile ? (
-        <Drawer open={!!selectedPhoto} onOpenChange={(isOpen) => !isOpen && setSelectedPhotoId(null)}>
-          <DrawerContent className="bg-background">
-            <div className="max-h-[85vh] overflow-y-auto">
-              <PhotoDetailView />
-            </div>
-          </DrawerContent>
-        </Drawer>
-      ) : (
-        <Dialog open={!!selectedPhoto} onOpenChange={(isOpen) => !isOpen && setSelectedPhotoId(null)}>
-          <DialogContent className="max-w-4xl bg-background">
-            {selectedPhoto && (
-              <>
-                <DialogHeader className="sr-only">
-                  <DialogTitle>Photo Details: {selectedPhoto.category}</DialogTitle>
-                  <DialogDescription>
-                    {selectedPhoto.caption || `An Onam celebration photo in the ${selectedPhoto.category} category.`}
-                  </DialogDescription>
-                </DialogHeader>
+      {isMobile !== null && (
+        isMobile ? (
+          <Drawer open={!!selectedPhoto} onOpenChange={(isOpen) => !isOpen && setSelectedPhotoId(null)}>
+            <DrawerContent className="bg-background">
+              <div className="max-h-[85vh] overflow-y-auto">
                 <PhotoDetailView />
-              </>
-            )}
-          </DialogContent>
-        </Dialog>
+              </div>
+            </DrawerContent>
+          </Drawer>
+        ) : (
+          <Dialog open={!!selectedPhoto} onOpenChange={(isOpen) => !isOpen && setSelectedPhotoId(null)}>
+            <DialogContent className="max-w-4xl bg-background">
+              {selectedPhoto && (
+                <>
+                  <DialogHeader className="sr-only">
+                    <DialogTitle>Photo Details: {selectedPhoto.category}</DialogTitle>
+                    <DialogDescription>
+                      {selectedPhoto.caption || `An Onam celebration photo in the ${selectedPhoto.category} category.`}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <PhotoDetailView />
+                </>
+              )}
+            </DialogContent>
+          </Dialog>
+        )
       )}
     </>
   );
