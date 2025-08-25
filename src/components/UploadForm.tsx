@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useGalleryStore } from "@/stores/galleryStore";
 import { showSuccess, showError } from "@/utils/toast";
 import { ImageUp, Upload, X } from "lucide-react";
 import CategoryChips from "./CategoryChips";
@@ -10,6 +9,7 @@ import { useSession } from "@/contexts/SessionContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface UploadFormProps {
   onUploadComplete: () => void;
@@ -26,8 +26,8 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const addPhoto = useGalleryStore((state) => state.addPhoto);
   const { user } = useSession();
+  const queryClient = useQueryClient();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setError(null);
@@ -72,7 +72,7 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
           throw new Error("Cloudinary upload did not return a valid URL or public ID.");
         }
 
-        const { data: newPhoto, error: insertError } = await supabase
+        const { error: insertError } = await supabase
           .from('photos')
           .insert({
             user_id: user.id,
@@ -81,16 +81,12 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
             category,
             cloudinary_public_id: uploadData.public_id,
             allow_download: allowDownload,
-          })
-          .select()
-          .single();
+          });
 
         if (insertError) throw insertError;
-        
-        if (newPhoto) {
-          addPhoto(newPhoto);
-        }
       }
+
+      queryClient.invalidateQueries({ queryKey: ['photos'] });
 
       const successMessage = files.length > 1 
         ? `🎉 ${files.length} Onam memories have been shared!`

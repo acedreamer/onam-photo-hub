@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useRef, useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import type { Photo, Profile } from '@/stores/galleryStore';
@@ -11,87 +11,82 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Loader2, Edit } from 'lucide-react';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
 const PHOTOS_PER_PAGE = 12;
+
+const fetchProfilePhotosPage = async ({ pageParam = 0, userId, currentUserId }: any) => {
+  const from = pageParam * PHOTOS_PER_PAGE;
+  const to = from + PHOTOS_PER_PAGE - 1;
+
+  const { data: photosData, error: photosError } = await supabase
+    .from('photos')
+    .select('*, profiles(full_name, avatar_url)')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .range(from, to);
+  if (photosError) throw photosError;
+
+  const { data: likesData, error: likesError } = await supabase
+    .from("likes")
+    .select("photo_id")
+    .eq("user_id", currentUserId);
+  if (likesError) throw likesError;
+  const likedPhotoIds = new Set(likesData?.map(like => like.photo_id) || []);
+
+  const newPhotos = (photosData || []).map(p => ({ ...p, user_has_liked: likedPhotoIds.has(p.id) }));
+  
+  return { data: newPhotos, nextPage: newPhotos.length === PHOTOS_PER_PAGE ? pageParam + 1 : undefined };
+};
 
 const ProfilePage = () => {
   const { userId } = useParams<{ userId: string }>();
   const { user: currentUser } = useSession();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [photos, setPhotos] = useState<Photo[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
-  const fetchProfileAndPhotos = useCallback(async (currentPage: number) => {
-    if (!userId || !currentUser) return;
-    
-    if (currentPage === 0) setLoading(true);
-    else setLoadingMore(true);
+  const { data: profile, isLoading: isLoadingProfile, refetch: refetchProfile } = useQuery({
+    queryKey: ['profile', userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('full_name, avatar_url, bio')
+        .eq('id', userId!)
+        .single();
+      if (error) throw error;
+      return data as Profile;
+    },
+    enabled: !!userId,
+  });
 
-    try {
-      if (currentPage === 0) {
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('full_name, avatar_url, bio')
-          .eq('id', userId)
-          .single();
-        if (profileError) throw profileError;
-        setProfile(profileData);
-      }
+  const {
+    data: photosData,
+    fetchNextPage,
+    hasNextPage,
+    isLoading: isLoadingPhotos,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+      queryKey: ['photos', 'profile', userId],
+      queryFn: ({ pageParam }) => fetchProfilePhotosPage({ pageParam, userId, currentUserId: currentUser!.id }),
+      getNextPageParam: (lastPage) => lastPage.nextPage,
+      enabled: !!userId && !!currentUser,
+  });
 
-      const from = currentPage * PHOTOS_PER_PAGE;
-      const to = from + PHOTOS_PER_PAGE - 1;
-
-      const { data: photosData, error: photosError } = await supabase
-        .from('photos')
-        .select('*, profiles(full_name, avatar_url)')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .range(from, to);
-      if (photosError) throw photosError;
-
-      const { data: likesData, error: likesError } = await supabase
-        .from("likes")
-        .select("photo_id")
-        .eq("user_id", currentUser.id);
-      if (likesError) throw likesError;
-      const likedPhotoIds = new Set(likesData?.map(like => like.photo_id) || []);
-
-      const newPhotos = (photosData || []).map(p => ({ ...p, user_has_liked: likedPhotoIds.has(p.id) }));
-
-      setPhotos(prev => currentPage === 0 ? newPhotos : [...prev, ...newPhotos]);
-      setPage(currentPage + 1);
-      setHasMore(newPhotos.length === PHOTOS_PER_PAGE);
-
-    } catch (error) {
-      console.error("Error fetching profile data:", error);
-    } finally {
-      setLoading(false);
-      setLoadingMore(false);
-    }
-  }, [userId, currentUser]);
-
-  useEffect(() => {
-    fetchProfileAndPhotos(0);
-  }, [fetchProfileAndPhotos]);
+  const photos = photosData?.pages.flatMap(page => page.data) ?? [];
 
   const observer = useRef<IntersectionObserver>();
   const lastPhotoElementRef = useCallback((node: HTMLDivElement) => {
-    if (loadingMore) return;
+    if (isFetchingNextPage) return;
     if (observer.current) observer.current.disconnect();
     observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMore) {
-        fetchProfileAndPhotos(page);
+      if (entries[0].isIntersecting && hasNextPage) {
+        fetchNextPage();
       }
     });
     if (node) observer.current.observe(node);
-  }, [loadingMore, hasMore, page, fetchProfileAndPhotos]);
+  }, [isFetchingNextPage, hasNextPage, fetchNextPage]);
 
-  if (loading) {
+  if (isLoadingProfile || isLoadingPhotos) {
     return (
       <div className="space-y-8">
         <div className="flex flex-col items-center space-y-4">
@@ -147,7 +142,7 @@ const ProfilePage = () => {
             ))}
           </div>
         )}
-        {loadingMore && (
+        {isFetchingNextPage && (
           <div className="flex justify-center items-center mt-8">
             <Loader2 className="h-8 w-8 animate-spin text-dark-leaf-green" />
           </div>
@@ -165,7 +160,7 @@ const ProfilePage = () => {
           profile={profile}
           isOpen={isEditDialogOpen}
           onOpenChange={setIsEditDialogOpen}
-          onProfileUpdate={(updatedProfile) => setProfile(updatedProfile)}
+          onProfileUpdate={() => refetchProfile()}
         />
       )}
     </>

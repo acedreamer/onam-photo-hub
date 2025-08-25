@@ -1,5 +1,4 @@
 import type { Photo } from "@/stores/galleryStore";
-import { useGalleryStore } from "@/stores/galleryStore";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, Tag, Heart, Trash2, Download } from "lucide-react";
@@ -21,6 +20,7 @@ import { showError } from "@/utils/toast";
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { useState } from "react";
+import { usePhotoMutations } from "@/hooks/usePhotoMutations";
 
 interface PhotoDetailProps {
   photo: Photo;
@@ -29,7 +29,7 @@ interface PhotoDetailProps {
 
 const PhotoDetail = ({ photo, onClose }: PhotoDetailProps) => {
   const { user, isAdmin } = useSession();
-  const { toggleLike, removePhoto } = useGalleryStore();
+  const { toggleLikeMutation, removePhotoMutation } = usePhotoMutations();
   const [isLiking, setIsLiking] = useState(false);
 
   const handleLike = () => {
@@ -37,12 +37,12 @@ const PhotoDetail = ({ photo, onClose }: PhotoDetailProps) => {
     if (!photo.user_has_liked) {
       setIsLiking(true);
     }
-    toggleLike(photo.id, user.id);
+    toggleLikeMutation.mutate({ photoId: photo.id, userHasLiked: !!photo.user_has_liked });
   };
 
   const handleDelete = async () => {
     if (photo.cloudinary_public_id) {
-      await removePhoto(photo.id, photo.cloudinary_public_id);
+      removePhotoMutation.mutate({ photoId: photo.id, cloudinaryPublicId: photo.cloudinary_public_id });
       onClose();
     } else {
       showError("Cannot delete photo: Cloudinary ID is missing.");
@@ -55,7 +55,6 @@ const PhotoDetail = ({ photo, onClose }: PhotoDetailProps) => {
       return imageUrl;
     }
     const parts = imageUrl.split('/upload/');
-    // Add Cloudinary flag to force download
     const transformation = 'fl_attachment';
     return `${parts[0]}/upload/${transformation}/${parts[1]}`;
   };

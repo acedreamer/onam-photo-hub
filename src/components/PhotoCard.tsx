@@ -1,10 +1,9 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Heart, Trash2 } from "lucide-react";
 import type { Photo } from "@/stores/galleryStore";
-import { useGalleryStore } from "@/stores/galleryStore";
 import { useSession } from "@/contexts/SessionContext";
 import { cn } from "@/lib/utils";
 import {
@@ -22,6 +21,7 @@ import { showError } from "@/utils/toast";
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import OptimizedImage from "./OptimizedImage";
+import { usePhotoMutations } from "@/hooks/usePhotoMutations";
 
 interface PhotoCardProps {
   photo: Photo;
@@ -29,8 +29,7 @@ interface PhotoCardProps {
 
 const PhotoCard = ({ photo }: PhotoCardProps) => {
   const { user, isAdmin } = useSession();
-  const toggleLike = useGalleryStore((state) => state.toggleLike);
-  const removePhoto = useGalleryStore((state) => state.removePhoto);
+  const { toggleLikeMutation, removePhotoMutation } = usePhotoMutations();
   const [isLiking, setIsLiking] = useState(false);
 
   const handleLikeClick = (e: React.MouseEvent) => {
@@ -40,14 +39,14 @@ const PhotoCard = ({ photo }: PhotoCardProps) => {
     if (!photo.user_has_liked) {
       setIsLiking(true);
     }
-    toggleLike(photo.id, user.id);
+    toggleLikeMutation.mutate({ photoId: photo.id, userHasLiked: !!photo.user_has_liked });
   };
 
   const stopPropagation = (e: React.MouseEvent) => e.stopPropagation();
 
-  const handleConfirmDelete = async () => {
+  const handleConfirmDelete = () => {
     if (photo.cloudinary_public_id) {
-      await removePhoto(photo.id, photo.cloudinary_public_id);
+      removePhotoMutation.mutate({ photoId: photo.id, cloudinaryPublicId: photo.cloudinary_public_id });
     } else {
       showError("Cannot delete photo: Cloudinary ID is missing.");
     }
@@ -131,4 +130,4 @@ const PhotoCard = ({ photo }: PhotoCardProps) => {
   );
 };
 
-export default PhotoCard;
+export default React.memo(PhotoCard);
