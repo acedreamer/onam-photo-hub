@@ -6,13 +6,15 @@ import { useSession } from '@/contexts/SessionContext';
 import PhotoCard from '@/components/PhotoCard';
 import PhotoDetail from '@/components/PhotoDetail';
 import EditProfileDialog from '@/components/EditProfileDialog';
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Loader2, Edit } from 'lucide-react';
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 import { VirtuosoGrid } from 'react-virtuoso';
-import ResponsiveDialog from '@/components/ResponsiveDialog';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const PHOTOS_PER_PAGE = 12;
 
@@ -46,6 +48,7 @@ const ProfilePage = () => {
   const queryClient = useQueryClient();
   const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   const { data: profile, isLoading: isLoadingProfile, refetch: refetchProfile } = useQuery({
     queryKey: ['profile', userId],
@@ -165,14 +168,21 @@ const ProfilePage = () => {
         )}
       </div>
 
-      <ResponsiveDialog
-        open={!!selectedPhoto}
-        onOpenChange={(isOpen) => !isOpen && setSelectedPhotoId(null)}
-        dialogClassName="max-w-4xl bg-ivory"
-        drawerClassName="bg-ivory"
-      >
-        <PhotoDetailView />
-      </ResponsiveDialog>
+      {isMobile ? (
+        <Drawer open={!!selectedPhoto} onOpenChange={(isOpen) => !isOpen && setSelectedPhotoId(null)}>
+          <DrawerContent className="bg-ivory">
+            <div className="max-h-[85vh] overflow-y-auto">
+              <PhotoDetailView />
+            </div>
+          </DrawerContent>
+        </Drawer>
+      ) : (
+        <Dialog open={!!selectedPhoto} onOpenChange={(isOpen) => !isOpen && setSelectedPhotoId(null)}>
+          <DialogContent className="max-w-4xl bg-ivory">
+            <PhotoDetailView />
+          </DialogContent>
+        </Dialog>
+      )}
 
       {isOwnProfile && profile && (
         <EditProfileDialog
