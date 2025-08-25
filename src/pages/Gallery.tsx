@@ -2,16 +2,15 @@ import { useCallback, useState } from "react";
 import { useGalleryStore } from "@/stores/galleryStore";
 import PhotoCard from "@/components/PhotoCard";
 import PhotoDetail from "@/components/PhotoDetail";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Drawer, DrawerContent } from "@/components/ui/drawer";
+import { DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useSession } from "@/contexts/SessionContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Loader2 } from "lucide-react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { VirtuosoGrid } from 'react-virtuoso';
-import { useIsMobile } from "@/hooks/use-mobile";
 import GalleryFilterDrawer from "@/components/GalleryFilterDrawer";
+import ResponsiveDialog from "@/components/ResponsiveDialog";
 
 const categories = ["All", "Pookalam", "Attire", "Performances", "Sadhya", "Candid"] as const;
 const PHOTOS_PER_PAGE = 12;
@@ -50,7 +49,6 @@ const Gallery = () => {
   const { filterCategory, sortBy, setFilterCategory, setSortBy } = useGalleryStore();
   const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null);
   const { user } = useSession();
-  const isMobile = useIsMobile();
 
   const {
     data,
@@ -166,33 +164,24 @@ const Gallery = () => {
         )}
       </div>
 
-      {isMobile !== null && (
-        isMobile ? (
-          <Drawer open={!!selectedPhoto} onOpenChange={(isOpen) => !isOpen && setSelectedPhotoId(null)}>
-            <DrawerContent className="bg-background">
-              <div className="max-h-[85vh] overflow-y-auto">
-                <PhotoDetailView />
-              </div>
-            </DrawerContent>
-          </Drawer>
-        ) : (
-          <Dialog open={!!selectedPhoto} onOpenChange={(isOpen) => !isOpen && setSelectedPhotoId(null)}>
-            <DialogContent className="max-w-4xl bg-background">
-              {selectedPhoto && (
-                <>
-                  <DialogHeader className="sr-only">
-                    <DialogTitle>Photo Details: {selectedPhoto.category}</DialogTitle>
-                    <DialogDescription>
-                      {selectedPhoto.caption || `An Onam celebration photo in the ${selectedPhoto.category} category.`}
-                    </DialogDescription>
-                  </DialogHeader>
-                  <PhotoDetailView />
-                </>
-              )}
-            </DialogContent>
-          </Dialog>
-        )
-      )}
+      <ResponsiveDialog
+        open={!!selectedPhoto}
+        onOpenChange={(isOpen) => !isOpen && setSelectedPhotoId(null)}
+        dialogClassName="max-w-4xl bg-background"
+        drawerClassName="bg-background"
+      >
+        {selectedPhoto && (
+          <>
+            <DialogHeader className="sr-only">
+              <DialogTitle>Photo Details: {selectedPhoto.category}</DialogTitle>
+              <DialogDescription>
+                {selectedPhoto.caption || `An Onam celebration photo in the ${selectedPhoto.category} category.`}
+              </DialogDescription>
+            </DialogHeader>
+            <PhotoDetailView />
+          </>
+        )}
+      </ResponsiveDialog>
     </>
   );
 };
