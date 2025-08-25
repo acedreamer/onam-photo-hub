@@ -82,7 +82,7 @@ const Gallery = () => {
   const GalleryFooter = () => {
     if (!isFetchingNextPage) return null;
     return (
-      <div className="flex justify-center items-center p-8 col-span-2 sm:col-span-3">
+      <div className="flex justify-center items-center p-8 col-span-3 sm:col-span-4">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
@@ -117,8 +117,8 @@ const Gallery = () => {
         </div>
         
         {isLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {Array.from({ length: 9 }).map((_, i) => (
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
+            {Array.from({ length: 12 }).map((_, i) => (
               <div key={i} className="break-inside-avoid">
                 <Skeleton className="w-full h-40 rounded-2xl" />
               </div>
@@ -155,7 +155,7 @@ const Gallery = () => {
                   </div>
                 );
               }}
-              listClassName="grid grid-cols-2 sm:grid-cols-3 gap-4"
+              listClassName="grid grid-cols-3 sm:grid-cols-4 gap-4"
             />
           </div>
         )}

@@ -54,8 +54,11 @@ const ProfilePage = () => {
         .select('full_name, avatar_url, bio')
         .eq('id', userId!)
         .single();
-      if (error) throw error;
-      return data as Profile;
+      
+      if (error && error.code !== 'PGRST116') { // Gracefully handle if profile doesn't exist
+        throw error;
+      }
+      return data as Profile | null;
     },
     enabled: !!userId,
   });
@@ -81,7 +84,7 @@ const ProfilePage = () => {
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  if (isLoadingProfile || isLoadingPhotos && !photos.length) {
+  if (isLoadingProfile || (isLoadingPhotos && !photos.length)) {
     return (
       <div className="space-y-8">
         <div className="flex flex-col items-center space-y-4">
@@ -89,8 +92,8 @@ const ProfilePage = () => {
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-4 w-64" />
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-40 w-full rounded-2xl" />)}
+        <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
+          {Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-40 w-full rounded-2xl" />)}
         </div>
       </div>
     );
@@ -103,7 +106,7 @@ const ProfilePage = () => {
   const ProfileFooter = () => {
     if (!isFetchingNextPage) return null;
     return (
-      <div className="flex justify-center items-center p-8 col-span-2 sm:col-span-3">
+      <div className="flex justify-center items-center p-8 col-span-3 sm:col-span-4">
         <Loader2 className="h-8 w-8 animate-spin text-dark-leaf-green" />
       </div>
     );
@@ -149,7 +152,7 @@ const ProfilePage = () => {
                   </div>
                 );
               }}
-              listClassName="grid grid-cols-2 sm:grid-cols-3 gap-4"
+              listClassName="grid grid-cols-3 sm:grid-cols-4 gap-4"
             />
           </div>
         )}
