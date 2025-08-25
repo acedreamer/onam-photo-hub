@@ -2,7 +2,7 @@ import type { Photo } from "@/stores/galleryStore";
 import { useGalleryStore } from "@/stores/galleryStore";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Tag, Heart, Trash2 } from "lucide-react";
+import { Calendar, Tag, Heart, Trash2, Download } from "lucide-react";
 import { format } from "date-fns";
 import { useSession } from "@/contexts/SessionContext";
 import { cn } from "@/lib/utils";
@@ -48,6 +48,16 @@ const PhotoDetail = ({ photo, onClose }: PhotoDetailProps) => {
       showError("Cannot delete photo: Cloudinary ID is missing.");
       onClose();
     }
+  };
+
+  const getDownloadUrl = (imageUrl: string) => {
+    if (!imageUrl.includes('/upload/')) {
+      return imageUrl;
+    }
+    const parts = imageUrl.split('/upload/');
+    // Add Cloudinary flag to force download
+    const transformation = 'fl_attachment';
+    return `${parts[0]}/upload/${transformation}/${parts[1]}`;
   };
 
   const uploaderName = photo.profiles?.full_name || "Anonymous";
@@ -111,6 +121,18 @@ const PhotoDetail = ({ photo, onClose }: PhotoDetailProps) => {
             {photo.likes || 0} {photo.likes === 1 ? 'like' : 'likes'}
           </span>
         </div>
+
+        {photo.allow_download && (
+          <div className="pt-2">
+            <a href={getDownloadUrl(photo.image_url)} download>
+              <Button variant="outline" className="w-full">
+                <Download className="h-4 w-4 mr-2" />
+                Download Photo
+              </Button>
+            </a>
+          </div>
+        )}
+
         {isAdmin && (
           <div className="pt-4 mt-auto border-t">
              <AlertDialog>

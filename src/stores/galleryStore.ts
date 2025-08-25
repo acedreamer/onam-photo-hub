@@ -19,6 +19,7 @@ export type Photo = {
   likes: number;
   created_at: string;
   cloudinary_public_id: string | null;
+  allow_download: boolean;
   user_has_liked?: boolean;
   profiles: Profile | null;
 };

@@ -8,6 +8,8 @@ import CategoryChips from "./CategoryChips";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useSession } from "@/contexts/SessionContext";
 import { supabase } from "@/integrations/supabase/client";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 interface UploadFormProps {
   onUploadComplete: () => void;
@@ -20,6 +22,7 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
   const [previews, setPreviews] = useState<string[]>([]);
   const [caption, setCaption] = useState("");
   const [category, setCategory] = useState("");
+  const [allowDownload, setAllowDownload] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -77,6 +80,7 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
             caption,
             category,
             cloudinary_public_id: uploadData.public_id,
+            allow_download: allowDownload,
           })
           .select()
           .single();
@@ -172,6 +176,18 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
           onValueChange={setCategory}
           disabled={previews.length === 0}
         />
+      </div>
+
+      <div className="flex items-center space-x-2 justify-center">
+        <Checkbox 
+          id="allow-download" 
+          checked={allowDownload}
+          onCheckedChange={(checked) => setAllowDownload(Boolean(checked))}
+          disabled={previews.length === 0}
+        />
+        <Label htmlFor="allow-download" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+          Allow others to download this photo
+        </Label>
       </div>
 
       {error && (
