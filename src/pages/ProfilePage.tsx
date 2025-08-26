@@ -108,7 +108,7 @@ const ProfilePage = () => {
   const ProfileFooter = () => {
     if (!isFetchingNextPage) return null;
     return (
-      <div className="flex justify-center items-center p-8 col-span-2 sm:col-span-3 md:col-span-4">
+      <div className="flex justify-center items-center p-8 col-span-2 sm:grid-cols-3 md:grid-cols-4">
         <Loader2 className="h-8 w-8 animate-spin text-dark-leaf-green" />
       </div>
     );
@@ -173,7 +173,7 @@ const ProfilePage = () => {
           onOpenChange={setIsEditDialogOpen}
           onProfileUpdate={() => {
             refetchProfile();
-            queryClient.invalidateQueries({ queryKey: ['photos', 'profile', userId] });
+            queryClient.invalidateQueries({ queryKey: ['photos'] });
           }}
         />
       )}
