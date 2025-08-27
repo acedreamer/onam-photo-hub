@@ -62,19 +62,6 @@ const SignUp = () => {
                   },
                 },
               },
-              styles: {
-                // This targets all buttons rendered by the Auth component, including social login buttons.
-                button: {
-                  backgroundColor: 'hsl(var(--primary))',
-                  color: 'hsl(var(--primary-foreground))',
-                  border: 'none',
-                  borderRadius: '0.5rem',
-                  fontWeight: '600',
-                  '&:hover': {
-                    backgroundColor: 'hsl(var(--primary) / 0.9)',
-                  },
-                },
-              },
             }}
             providers={['google']}
             redirectTo={window.location.origin}
