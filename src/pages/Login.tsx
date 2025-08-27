@@ -46,7 +46,24 @@ const Login = () => {
         <div className="p-8 bg-card rounded-2xl shadow-lg border dark:border-bright-gold/20">
           <Auth
             supabaseClient={supabase}
-            appearance={{ theme: ThemeSupa }}
+            appearance={{
+              theme: ThemeSupa,
+              extend: true,
+              variables: {
+                default: {
+                  colors: {
+                    brand: 'hsl(var(--primary))',
+                    brandAccent: 'hsl(var(--primary-foreground))',
+                  },
+                },
+              },
+              // Custom styling for Google button
+              // Note: ThemeSupa already handles most styling, this is for specific overrides
+              // The 'button' key targets the social buttons
+              button: {
+                className: 'bg-dark-leaf-green text-white hover:bg-dark-leaf-green/90',
+              },
+            }}
             providers={['google']}
             redirectTo={window.location.origin}
             view="sign_in"
