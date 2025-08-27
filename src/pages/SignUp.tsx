@@ -57,9 +57,8 @@ const SignUp = () => {
               variables: {
                 default: {
                   colors: {
-                    brand: '#006400', // dark-leaf-green for primary buttons
-                    brandAccent: '#FAFAF5', // ivory for primary button text
-                    defaultButtonBackground: '#E5E7EB', // light gray for default buttons
+                    // These variables are for general theme elements, not directly for the primary button
+                    defaultButtonBackground: '#E5E7EB', // light gray for default buttons (e.g., Google)
                     defaultButtonBackgroundHover: '#D1D5DB', // slightly darker gray on hover
                     defaultButtonBorder: '#D1D5DB', // border for default buttons
                     defaultButtonText: '#333333', // neutral gray for default button text
@@ -80,7 +79,17 @@ const SignUp = () => {
                   },
                 },
               },
-              styles: { // Keep other styles that don't conflict with primary button variables
+              styles: {
+                button: {
+                  backgroundColor: '#006400', // dark-leaf-green for primary button
+                  color: '#FAFAF5', // ivory for primary button text
+                  borderRadius: '0.5rem',
+                  fontWeight: '600',
+                  '&:hover': {
+                    backgroundColor: '#004d00', // Slightly darker green for hover
+                    color: '#FAFAF5',
+                  },
+                },
                 input: {
                   borderColor: 'hsl(var(--border))',
                   borderRadius: '0.5rem',
