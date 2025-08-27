@@ -62,6 +62,34 @@ const SignUp = () => {
                   },
                 },
               },
+              styles: {
+                button: {
+                  backgroundColor: 'hsl(var(--primary))',
+                  color: 'hsl(var(--primary-foreground))',
+                  borderRadius: '0.5rem',
+                  fontWeight: '600',
+                  '&:hover': {
+                    backgroundColor: 'hsl(var(--primary) / 0.9)',
+                  },
+                },
+                input: {
+                  borderColor: 'hsl(var(--border))',
+                  borderRadius: '0.5rem',
+                  '&:focus': {
+                    borderColor: 'hsl(var(--ring))',
+                    boxShadow: '0 0 0 2px hsl(var(--ring) / 0.2)',
+                  },
+                },
+                label: {
+                  color: 'hsl(var(--foreground))',
+                },
+                anchor: {
+                  color: 'hsl(var(--primary))',
+                  '&:hover': {
+                    color: 'hsl(var(--primary) / 0.8)',
+                  },
+                },
+              },
             }}
             providers={['google']}
             redirectTo={window.location.origin}
