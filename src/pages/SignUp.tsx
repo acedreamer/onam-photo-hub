@@ -57,8 +57,37 @@ const SignUp = () => {
               variables: {
                 default: {
                   colors: {
-                    brand: 'hsl(var(--primary))', // Primary button background
-                    brandAccent: 'hsl(var(--primary-foreground))', // Primary button text
+                    brand: '#006400', // dark-leaf-green
+                    brandAccent: '#FAFAF5', // ivory
+                  },
+                },
+              },
+              styles: {
+                button: {
+                  backgroundColor: '#006400', // dark-leaf-green
+                  color: '#FAFAF5', // ivory
+                  borderRadius: '0.5rem',
+                  fontWeight: '600',
+                  '&:hover': {
+                    backgroundColor: '#004d00', // Slightly darker green for hover
+                    color: '#FAFAF5',
+                  },
+                },
+                input: {
+                  borderColor: 'hsl(var(--border))',
+                  borderRadius: '0.5rem',
+                  '&:focus': {
+                    borderColor: 'hsl(var(--ring))',
+                    boxShadow: '0 0 0 2px rgba(0, 100, 0, 0.2)', // Green shadow
+                  },
+                },
+                label: {
+                  color: 'hsl(var(--foreground))',
+                },
+                anchor: {
+                  color: '#006400', // dark-leaf-green
+                  '&:hover': {
+                    color: '#004d00', // Slightly darker green for hover
                   },
                 },
               },
