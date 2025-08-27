@@ -52,11 +52,15 @@ const Login = () => {
               variables: {
                 default: {
                   colors: {
-                    // These variables are for general theme elements, not directly for the primary button
-                    defaultButtonBackground: '#E5E7EB', // light gray for default buttons (e.g., Google)
-                    defaultButtonBackgroundHover: '#D1D5DB', // slightly darker gray on hover
-                    defaultButtonBorder: '#D1D5DB', // border for default buttons
-                    defaultButtonText: '#333333', // neutral gray for default button text
+                    brand: '#006400', // dark-leaf-green for primary buttons
+                    brandAccent: '#FAFAF5', // ivory for primary button text
+                    
+                    // Onam theming for social provider buttons (e.g., Google)
+                    defaultButtonBackground: '#FAFAF5', // ivory
+                    defaultButtonBackgroundHover: '#FFD700', // bright-gold
+                    defaultButtonBorder: '#006400', // dark-leaf-green
+                    defaultButtonText: '#006400', // dark-leaf-green
+
                     inputBackground: '#FFFFFF', // white for input background
                     inputBorder: '#E5E7EB', // light gray for input border
                     inputBorderHover: '#D1D5DB', // slightly darker gray on hover
