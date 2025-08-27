@@ -80,6 +80,25 @@ const SignUp = () => {
                   },
                 },
               },
+              styles: { // Keep other styles that don't conflict with primary button variables
+                input: {
+                  borderColor: 'hsl(var(--border))',
+                  borderRadius: '0.5rem',
+                  '&:focus': {
+                    borderColor: 'hsl(var(--ring))',
+                    boxShadow: '0 0 0 2px rgba(0, 100, 0, 0.2)', // Green shadow
+                  },
+                },
+                label: {
+                  color: 'hsl(var(--foreground))',
+                },
+                anchor: {
+                  color: '#006400', // dark-leaf-green
+                  '&:hover': {
+                    color: '#004d00', // Slightly darker green for hover
+                  },
+                },
+              },
             }}
             providers={['google']}
             redirectTo={window.location.origin}
