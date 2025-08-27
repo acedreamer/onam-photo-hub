@@ -52,16 +52,23 @@ const Login = () => {
               variables: {
                 default: {
                   colors: {
-                    brand: 'hsl(var(--primary))',
-                    brandAccent: 'hsl(var(--primary-foreground))',
+                    brand: 'hsl(var(--primary))', // Primary button background
+                    brandAccent: 'hsl(var(--primary-foreground))', // Primary button text
                   },
                 },
               },
-              // Custom styling for Google button
-              // Note: ThemeSupa already handles most styling, this is for specific overrides
-              // The 'button' key targets the social buttons
-              button: {
-                className: 'bg-dark-leaf-green text-white hover:bg-dark-leaf-green/90',
+              styles: {
+                // This targets all buttons rendered by the Auth component, including social login buttons.
+                button: {
+                  backgroundColor: 'hsl(var(--primary))',
+                  color: 'hsl(var(--primary-foreground))',
+                  border: 'none',
+                  borderRadius: '0.5rem',
+                  fontWeight: '600',
+                  '&:hover': {
+                    backgroundColor: 'hsl(var(--primary) / 0.9)',
+                  },
+                },
               },
             }}
             providers={['google']}
