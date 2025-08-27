@@ -57,37 +57,26 @@ const SignUp = () => {
               variables: {
                 default: {
                   colors: {
-                    brand: '#006400', // dark-leaf-green
-                    brandAccent: '#FAFAF5', // ivory
+                    brand: '#006400', // dark-leaf-green for primary buttons
+                    brandAccent: '#FAFAF5', // ivory for primary button text
+                    defaultButtonBackground: '#E5E7EB', // light gray for default buttons
+                    defaultButtonBackgroundHover: '#D1D5DB', // slightly darker gray on hover
+                    defaultButtonBorder: '#D1D5DB', // border for default buttons
+                    defaultButtonText: '#333333', // neutral gray for default button text
+                    inputBackground: '#FFFFFF', // white for input background
+                    inputBorder: '#E5E7EB', // light gray for input border
+                    inputBorderHover: '#D1D5DB', // slightly darker gray on hover
+                    inputBorderFocus: '#006400', // dark-leaf-green on focus
+                    inputText: '#333333', // neutral gray for input text
+                    inputPlaceholder: '#6B7280', // gray for placeholder text
+                    text: '#333333', // neutral gray for general text
+                    textAccent: '#006400', // dark-leaf-green for links/accents
+                    textLink: '#006400', // dark-leaf-green for links
+                    textLinkHover: '#004d00', // slightly darker green for link hover
                   },
-                },
-              },
-              styles: {
-                button: {
-                  backgroundColor: '#006400', // dark-leaf-green
-                  color: '#FAFAF5', // ivory
-                  borderRadius: '0.5rem',
-                  fontWeight: '600',
-                  '&:hover': {
-                    backgroundColor: '#004d00', // Slightly darker green for hover
-                    color: '#FAFAF5',
-                  },
-                },
-                input: {
-                  borderColor: 'hsl(var(--border))',
-                  borderRadius: '0.5rem',
-                  '&:focus': {
-                    borderColor: 'hsl(var(--ring))',
-                    boxShadow: '0 0 0 2px rgba(0, 100, 0, 0.2)', // Green shadow
-                  },
-                },
-                label: {
-                  color: 'hsl(var(--foreground))',
-                },
-                anchor: {
-                  color: '#006400', // dark-leaf-green
-                  '&:hover': {
-                    color: '#004d00', // Slightly darker green for hover
+                  radii: {
+                    borderRadiusButton: '0.5rem',
+                    borderRadiusInput: '0.5rem',
                   },
                 },
               },
