@@ -124,7 +124,7 @@ const ProfilePage = () => {
 
   return (
     <>
-      <div className="space-y-8">
+      <div className="space-y-8 flex flex-col flex-grow">
         <div className="flex flex-col items-center text-center space-y-4">
           <Avatar className="h-24 w-24 border-4 border-bright-gold">
             <AvatarImage src={profile?.avatar_url || undefined} alt={uploaderName} />
@@ -145,7 +145,7 @@ const ProfilePage = () => {
         {photos.length === 0 && !isLoadingPhotos ? (
           <p className="text-center text-neutral-gray pt-8">This user hasn't shared any photos yet.</p>
         ) : (
-          <div style={{ height: '60vh' }}>
+          <div className="flex-grow pt-4">
             <VirtuosoGrid
               totalCount={photos.length}
               endReached={loadMore}

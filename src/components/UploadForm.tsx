@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { showSuccess, showError } from "@/utils/toast";
-import { ImageUp, Upload, X } from "lucide-react";
+import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
+import { ImageUp, Upload, X, Loader2 } from "lucide-react";
 import CategoryChips from "./CategoryChips";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useSession } from "@/contexts/SessionContext";
@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useQueryClient } from "@tanstack/react-query";
 import { DrawerHeader, DrawerTitle, DrawerDescription } from "@/components/ui/drawer";
+import imageCompression from 'browser-image-compression';
 
 interface UploadFormProps {
   onUploadComplete: () => void;
@@ -24,27 +25,54 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
   const [caption, setCaption] = useState("");
   const [category, setCategory] = useState("");
   const [allowDownload, setAllowDownload] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingMessage, setProcessingMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { user } = useSession();
   const queryClient = useQueryClient();
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setError(null);
     const selectedFiles = event.target.files;
-    if (selectedFiles) {
-      const newFiles = Array.from(selectedFiles);
-      for (const file of newFiles) {
-        if (!file.type.startsWith("image/")) {
-          setError("Please select only valid image files.");
-          resetSelection();
-          return;
-        }
+    if (!selectedFiles || selectedFiles.length === 0) return;
+
+    const newFiles = Array.from(selectedFiles);
+    for (const file of newFiles) {
+      if (!file.type.startsWith("image/")) {
+        setError("Please select only valid image files.");
+        return;
       }
-      setFiles(newFiles);
-      const newPreviews = newFiles.map(file => URL.createObjectURL(file));
+    }
+
+    setIsProcessing(true);
+    setProcessingMessage("Compressing images...");
+    const toastId = showLoading("Preparing your images...");
+
+    try {
+      const compressionOptions = {
+        maxSizeMB: 2,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+        initialQuality: 0.8,
+      };
+
+      const compressedFiles = await Promise.all(
+        newFiles.map(file => imageCompression(file, compressionOptions))
+      );
+      
+      dismissToast(toastId);
+      setFiles(compressedFiles);
+      const newPreviews = compressedFiles.map(file => URL.createObjectURL(file));
       setPreviews(newPreviews);
+    } catch (compressionError) {
+      dismissToast(toastId);
+      showError("Could not process images. Please try again.");
+      setError("Image processing failed.");
+      console.error("Compression Error:", compressionError);
+    } finally {
+      setIsProcessing(false);
+      setProcessingMessage("");
     }
   };
 
@@ -56,7 +84,8 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
       return;
     }
 
-    setIsUploading(true);
+    setIsProcessing(true);
+    setProcessingMessage("Uploading...");
     
     try {
       for (const file of files) {
@@ -100,7 +129,8 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
       showError(`Upload failed: ${errorMessage}`);
       setError(`Upload failed: ${errorMessage}`);
     } finally {
-      setIsUploading(false);
+      setIsProcessing(false);
+      setProcessingMessage("");
     }
   };
 
@@ -119,6 +149,23 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
     };
   }, [previews]);
 
+  const getButtonContent = () => {
+    if (isProcessing) {
+      return (
+        <>
+          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          {processingMessage}
+        </>
+      );
+    }
+    return (
+      <>
+        Share {files.length || ''} Photo{files.length !== 1 ? 's' : ''}
+        <Upload className="h-4 w-4 ml-2" />
+      </>
+    );
+  };
+
   return (
     <>
       <DrawerHeader>
@@ -133,6 +180,7 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
           accept="image/*"
           className="hidden"
           multiple
+          disabled={isProcessing}
         />
 
         {previews.length > 0 ? (
@@ -144,14 +192,14 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
                 </div>
               ))}
             </div>
-            <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-8 w-8" onClick={resetSelection}>
+            <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-8 w-8" onClick={resetSelection} disabled={isProcessing}>
               <X className="h-4 w-4" />
             </Button>
           </div>
         ) : (
           <div 
             className="w-full aspect-square rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-500 cursor-pointer hover:bg-gray-50 transition-colors"
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => !isProcessing && fileInputRef.current?.click()}
           >
             <ImageUp className="h-12 w-12 mb-2" />
             <span className="font-medium">Click to select photos</span>
@@ -163,7 +211,7 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
           value={caption}
           onChange={(e) => setCaption(e.target.value)}
           className="resize-none"
-          disabled={previews.length === 0}
+          disabled={previews.length === 0 || isProcessing}
         />
 
         <div>
@@ -172,7 +220,7 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
             categories={uploadCategories}
             value={category}
             onValueChange={setCategory}
-            disabled={previews.length === 0}
+            disabled={previews.length === 0 || isProcessing}
           />
         </div>
 
@@ -181,7 +229,7 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
             id="allow-download" 
             checked={allowDownload}
             onCheckedChange={(checked) => setAllowDownload(Boolean(checked))}
-            disabled={previews.length === 0}
+            disabled={previews.length === 0 || isProcessing}
           />
           <Label htmlFor="allow-download" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             Allow others to download this photo
@@ -197,10 +245,9 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
         <Button 
           type="submit" 
           className="w-full bg-dark-leaf-green hover:bg-dark-leaf-green/90" 
-          disabled={isUploading || files.length === 0 || !category}
+          disabled={isProcessing || files.length === 0 || !category}
         >
-          {isUploading ? "Sharing..." : `Share ${files.length} Photo${files.length > 1 ? 's' : ''}`}
-          {!isUploading && <Upload className="h-4 w-4 ml-2" />}
+          {getButtonContent()}
         </Button>
       </form>
     </>
