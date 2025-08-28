@@ -55,8 +55,8 @@ const PhotoDetail = ({ photo, onClose }: PhotoDetailProps) => {
       return imageUrl;
     }
     const parts = imageUrl.split('/upload/');
-    // Add fl_attachment, q_auto:good, f_auto, and a max width for optimized downloads
-    const transformation = 'fl_attachment,w_2000,q_auto:good,f_auto'; 
+    // Add fl_attachment, w_2000, q_auto, f_auto, fl_force_strip, and limit_bytes:1000000 (1MB) for optimized downloads
+    const transformation = 'fl_attachment,w_2000,q_auto,f_auto,fl_force_strip,limit_bytes:1000000'; 
     return `${parts[0]}/upload/${transformation}/${parts[1]}`;
   };
 
