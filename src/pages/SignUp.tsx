@@ -1,23 +1,15 @@
-import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Navigate } from 'react-router-dom';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
-import { showError } from '@/utils/toast';
 import { useSession } from '@/contexts/SessionContext';
 
 const SignUp = () => {
   const { session } = useSession();
-  const [authError, setAuthError] = useState<string | null>(null);
 
   if (session) {
     return <Navigate to="/" replace />;
   }
-
-  const handleAuthError = (error: Error) => {
-    setAuthError(error.message);
-    showError(error.message);
-  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 overflow-hidden relative">
@@ -128,11 +120,7 @@ const SignUp = () => {
                 },
               },
             }}
-            onError={handleAuthError}
           />
-          {authError && (
-            <p className="text-red-500 text-sm mt-4 text-center">{authError}</p>
-          )}
         </div>
       </div>
     </div>
