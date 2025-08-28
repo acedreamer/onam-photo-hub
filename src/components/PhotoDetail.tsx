@@ -1,5 +1,5 @@
 import type { Photo } from "@/stores/galleryStore";
-import { Badge } from "@/components/ui/badge";
+import { Badge } => "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, Tag, Heart, Trash2, Download } from "lucide-react";
 import { format } from "date-fns";
@@ -55,8 +55,8 @@ const PhotoDetail = ({ photo, onClose }: PhotoDetailProps) => {
       return imageUrl;
     }
     const parts = imageUrl.split('/upload/');
-    // Add fl_attachment, w_2000, q_auto, f_auto, fl_force_strip, and limit_bytes:1000000 (1MB) for optimized downloads
-    const transformation = 'fl_attachment,w_2000,q_auto,f_auto,fl_force_strip,limit_bytes:1000000'; 
+    // Corrected: Use 'l_1000000' for limit_bytes to ensure proper URL construction
+    const transformation = 'fl_attachment,w_2000,q_auto,f_auto,fl_force_strip,l_1000000'; 
     return `${parts[0]}/upload/${transformation}/${parts[1]}`;
   };
 
