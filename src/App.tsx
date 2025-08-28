@@ -5,10 +5,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
-import { SessionProvider, useSession } from "./contexts/SessionContext";
+import { SessionProvider } from "./contexts/SessionContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { Loader2 } from "lucide-react";
-import ConnectionError from "./components/ConnectionError";
 
 // Lazy load page components for code splitting
 const Gallery = lazy(() => import("./pages/Gallery"));
@@ -27,35 +26,6 @@ const LoadingFallback = () => (
   </div>
 );
 
-const AppContent = () => {
-  const { loading, connectionError } = useSession();
-
-  if (loading) {
-    return <LoadingFallback />;
-  }
-
-  if (connectionError) {
-    return <ConnectionError />;
-  }
-
-  return (
-    <Suspense fallback={<LoadingFallback />}>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Gallery />} />
-            <Route path="about" element={<About />} />
-            <Route path="profile/:userId" element={<ProfilePage />} />
-          </Route>
-        </Route>
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </Suspense>
-  );
-};
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -63,7 +33,20 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <SessionProvider>
-          <AppContent />
+          <Suspense fallback={<LoadingFallback />}>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route element={<ProtectedRoute />}>
+                <Route path="/" element={<Layout />}>
+                  <Route index element={<Gallery />} />
+                  <Route path="about" element={<About />} />
+                  <Route path="profile/:userId" element={<ProfilePage />} />
+                </Route>
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
         </SessionProvider>
       </BrowserRouter>
     </TooltipProvider>

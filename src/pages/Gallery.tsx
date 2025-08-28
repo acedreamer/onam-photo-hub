@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { useGalleryStore, type Photo, type SortByType } from "@/stores/galleryStore";
+import { useGalleryStore } from "@/stores/galleryStore";
 import PhotoCard from "@/components/PhotoCard";
 import PhotoDetail from "@/components/PhotoDetail";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -16,7 +16,7 @@ import GalleryFilterDrawer from "@/components/GalleryFilterDrawer";
 const categories = ["All", "Pookalam", "Attire", "Performances", "Sadhya", "Candid"] as const;
 const PHOTOS_PER_PAGE = 12;
 
-const fetchPhotosPage = async ({ pageParam = 0, queryKey, userId }: { pageParam: number, queryKey: [string, { filterCategory: string; sortBy: SortByType; }], userId: string }) => {
+const fetchPhotosPage = async ({ pageParam = 0, queryKey, userId }: any) => {
   const [_key, { filterCategory, sortBy }] = queryKey;
   
   const from = pageParam * PHOTOS_PER_PAGE;
@@ -62,7 +62,6 @@ const Gallery = () => {
       queryKey: ['photos', { filterCategory, sortBy }],
       queryFn: ({ pageParam }) => fetchPhotosPage({ pageParam, queryKey: ['photos', { filterCategory, sortBy }], userId: user!.id }),
       getNextPageParam: (lastPage) => lastPage.nextPage,
-      initialPageParam: 0,
       enabled: !!user,
   });
 
@@ -94,7 +93,7 @@ const Gallery = () => {
 
   const PhotoDetailView = () => {
     if (!selectedPhoto) return null;
-    return <PhotoDetail photo={selectedPhoto as Photo} onClose={() => setSelectedPhotoId(null)} />;
+    return <PhotoDetail photo={selectedPhoto} onClose={() => setSelectedPhotoId(null)} />;
   };
 
   return (
@@ -157,7 +156,7 @@ const Gallery = () => {
                     className="cursor-pointer"
                     onClick={() => setSelectedPhotoId(photo.id)}
                   >
-                    <PhotoCard photo={photo as Photo} />
+                    <PhotoCard photo={photo} />
                   </div>
                 );
               }}

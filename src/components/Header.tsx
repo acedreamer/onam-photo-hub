@@ -6,13 +6,11 @@ import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
   const { session } = useSession();
-  // The navigate hook is no longer directly used for sign-out redirection
-  // const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    // Redirection to /login is now handled by the ProtectedRoute
-    // component reacting to the session becoming null in SessionContext.
+    navigate('/login');
   };
 
   if (!session) return null;
