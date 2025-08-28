@@ -67,44 +67,34 @@ const Login = () => {
                     inputBorderFocus: '#006400', // dark-leaf-green on focus
                     inputText: '#333333', // neutral gray for input text
                     inputPlaceholder: '#6B7280', // gray for placeholder text
-                    text: '#333333', // neutral gray for general text
-                    textAccent: '#006400', // dark-leaf-green for links/accents
-                    textLink: '#006400', // dark-leaf-green for links
-                    textLinkHover: '#004d00', // slightly darker green for link hover
+                    anchorText: '#006400', // dark-leaf-green for links
+                    anchorTextHoverColor: '#004d00', // Slightly darker green for link hover
                   },
                   radii: {
                     borderRadiusButton: '0.5rem',
-                    borderRadiusInput: '0.5rem',
+                    inputBorderRadius: '0.5rem',
                   },
                 },
               },
-              styles: {
+              style: {
                 button: {
                   backgroundColor: '#006400', // dark-leaf-green for primary button
                   color: '#FAFAF5', // ivory for primary button text
                   borderRadius: '0.5rem',
                   fontWeight: '600',
-                  '&:hover': {
-                    backgroundColor: '#004d00', // Slightly darker green for hover
-                    color: '#FAFAF5',
-                  },
+                  // Hover handled by defaultButtonBackgroundHover
                 },
                 input: {
                   borderColor: 'hsl(var(--border))',
                   borderRadius: '0.5rem',
-                  '&:focus': {
-                    borderColor: 'hsl(var(--ring))',
-                    boxShadow: '0 0 0 2px rgba(0, 100, 0, 0.2)', // Green shadow
-                  },
+                  // Focus handled by inputBorderFocus
                 },
                 label: {
                   color: 'hsl(var(--foreground))',
                 },
                 anchor: {
                   color: '#006400', // dark-leaf-green
-                  '&:hover': {
-                    color: '#004d00', // Slightly darker green for hover
-                  },
+                  // Hover handled by anchorTextHoverColor
                 },
               },
             }}

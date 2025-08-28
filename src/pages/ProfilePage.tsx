@@ -12,13 +12,18 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Loader2, Edit } from 'lucide-react';
-import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery, useQueryClient, InfiniteData } from '@tanstack/react-query'; // Import InfiniteData
 import { VirtuosoGrid } from 'react-virtuoso';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const PHOTOS_PER_PAGE = 12;
 
-const fetchProfilePhotosPage = async ({ pageParam = 0, userId, currentUserId }: any) => {
+interface PhotoPageResult {
+  data: Photo[];
+  nextPage: number | undefined;
+}
+
+const fetchProfilePhotosPage = async ({ pageParam = 0, userId, currentUserId }: any): Promise<PhotoPageResult> => {
   const from = pageParam * PHOTOS_PER_PAGE;
   const to = from + PHOTOS_PER_PAGE - 1;
 
@@ -73,9 +78,10 @@ const ProfilePage = () => {
     hasNextPage,
     isLoading: isLoadingPhotos,
     isFetchingNextPage,
-  } = useInfiniteQuery({
+  } = useInfiniteQuery<PhotoPageResult, Error, InfiniteData<PhotoPageResult>, string[], number>({
       queryKey: ['photos', 'profile', userId],
       queryFn: ({ pageParam }) => fetchProfilePhotosPage({ pageParam, userId, currentUserId: currentUser!.id }),
+      initialPageParam: 0,
       getNextPageParam: (lastPage) => lastPage.nextPage,
       enabled: !!userId && !!currentUser,
   });
@@ -162,7 +168,7 @@ const ProfilePage = () => {
                   </div>
                 );
               }}
-              listClassName="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
+              listClassName="grid grid-cols-2 sm:grid-cols-3 md:col-span-4 gap-4"
             />
           </div>
         )}
@@ -189,7 +195,7 @@ const ProfilePage = () => {
           profile={profile}
           isOpen={isEditDialogOpen}
           onOpenChange={setIsEditDialogOpen}
-          onProfileUpdate={() => {
+          onProfileUpdate={() => { // Changed to no arguments
             refetchProfile();
             queryClient.invalidateQueries({ queryKey: ['photos', 'profile', userId] });
           }}

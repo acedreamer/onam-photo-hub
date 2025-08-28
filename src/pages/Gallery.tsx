@@ -7,16 +7,22 @@ import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { useSession } from "@/contexts/SessionContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Loader2 } from "lucide-react";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, InfiniteData } from "@tanstack/react-query"; // Import InfiniteData
 import { supabase } from "@/integrations/supabase/client";
 import { VirtuosoGrid } from 'react-virtuoso';
 import { useIsMobile } from "@/hooks/use-mobile";
 import GalleryFilterDrawer from "@/components/GalleryFilterDrawer";
+import type { Photo } from "@/stores/galleryStore"; // Import Photo type
 
 const categories = ["All", "Pookalam", "Attire", "Performances", "Sadhya", "Candid"] as const;
 const PHOTOS_PER_PAGE = 12;
 
-const fetchPhotosPage = async ({ pageParam = 0, queryKey, userId }: any) => {
+interface PhotoPageResult {
+  data: Photo[];
+  nextPage: number | undefined;
+}
+
+const fetchPhotosPage = async ({ pageParam = 0, queryKey, userId }: any): Promise<PhotoPageResult> => {
   const [_key, { filterCategory, sortBy }] = queryKey;
   
   const from = pageParam * PHOTOS_PER_PAGE;
@@ -58,9 +64,10 @@ const Gallery = () => {
     hasNextPage,
     isLoading,
     isFetchingNextPage,
-  } = useInfiniteQuery({
+  } = useInfiniteQuery<PhotoPageResult, Error, InfiniteData<PhotoPageResult>, (string | { filterCategory: string; sortBy: 'created_at' | 'likes'; })[], number>({
       queryKey: ['photos', { filterCategory, sortBy }],
       queryFn: ({ pageParam }) => fetchPhotosPage({ pageParam, queryKey: ['photos', { filterCategory, sortBy }], userId: user!.id }),
+      initialPageParam: 0,
       getNextPageParam: (lastPage) => lastPage.nextPage,
       enabled: !!user,
   });
@@ -160,7 +167,7 @@ const Gallery = () => {
                   </div>
                 );
               }}
-              listClassName="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
+              listClassName="grid grid-cols-2 sm:grid-cols-3 md:col-span-4 gap-4"
             />
           </div>
         )}

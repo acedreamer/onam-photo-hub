@@ -23,7 +23,7 @@ interface EditProfileDialogProps {
   profile: Profile;
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  onProfileUpdate: () => void;
+  onProfileUpdate: () => void; // Changed to accept no arguments
 }
 
 const EditProfileDialog = ({ profile, isOpen, onOpenChange, onProfileUpdate }: EditProfileDialogProps) => {
@@ -86,7 +86,7 @@ const EditProfileDialog = ({ profile, isOpen, onOpenChange, onProfileUpdate }: E
 
       if (error) throw error;
 
-      onProfileUpdate();
+      onProfileUpdate(); // Called without arguments
       showSuccess('Profile updated successfully!');
       onOpenChange(false);
     } catch (error: any) {
