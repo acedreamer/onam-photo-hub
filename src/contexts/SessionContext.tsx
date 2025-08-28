@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useRef } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { showError } from '@/utils/toast';
@@ -25,18 +25,25 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [connectionError, setConnectionError] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (loading) {
+    // Start a timeout to detect connection issues if onAuthStateChange doesn't fire
+    timeoutRef.current = setTimeout(() => {
+      if (loading) { // Only set error if still in loading state
         setConnectionError(true);
         setLoading(false);
         showError("Connection failed. Please check your network or ad blocker settings.");
       }
-    }, 7000);
+    }, 7000); // 7 seconds timeout
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      clearTimeout(timer);
+      // Clear the timeout as soon as any auth state change event is received
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      setConnectionError(false); // Reset connection error if an event comes through
 
       if (event === 'SIGNED_IN' && session?.user) {
         const userEmail = session.user.email;
@@ -47,7 +54,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
           setSession(null);
           setUser(null);
           setIsAdmin(false);
-          setLoading(false);
+          setLoading(false); // Ensure loading is false after handling restricted access
           return;
         }
       }
@@ -56,25 +63,37 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
       setUser(session?.user ?? null);
 
       if (session?.user) {
-        const { data } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', session.user.id)
-          .single();
-        
-        setIsAdmin(data?.role === 'admin');
+        try {
+          const { data, error } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', session.user.id)
+            .single();
+          
+          if (error && error.code !== 'PGRST116') { // PGRST116 means "No rows found"
+            console.error("Error fetching user roles:", error);
+            setIsAdmin(false); // Default to not admin on error
+          } else {
+            setIsAdmin(data?.role === 'admin');
+          }
+        } catch (roleError) {
+          console.error("Unhandled error fetching user roles:", roleError);
+          setIsAdmin(false); // Default to not admin on unhandled error
+        }
       } else {
         setIsAdmin(false);
       }
 
-      setLoading(false);
+      setLoading(false); // Always set loading to false after processing an auth state change
     });
 
     return () => {
       subscription.unsubscribe();
-      clearTimeout(timer);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
     };
-  }, []);
+  }, []); // Empty dependency array to run once on mount
 
   const value = {
     session,
