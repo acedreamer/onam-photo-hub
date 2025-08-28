@@ -53,7 +53,8 @@ const Login = () => {
                 default: {
                   colors: {
                     brand: '#006400', // dark-leaf-green for primary buttons
-                    brandAccent: '#FAFAF5', // ivory for primary button text
+                    brandAccent: '#004d00', // hover color for brand button
+                    brandButtonText: '#FAFAF5', // text color for brand button
                     
                     // Onam theming for social provider buttons (e.g., Google)
                     defaultButtonBackground: '#FAFAF5', // ivory
@@ -64,7 +65,7 @@ const Login = () => {
                     inputBackground: '#FFFFFF', // white for input background
                     inputBorder: '#E5E7EB', // light gray for input border
                     inputBorderHover: '#D1D5DB', // slightly darker gray on hover
-                    inputBorderFocus: '#006400', // dark-leaf-green on focus
+                    inputBorderFocus: 'hsl(var(--ring))', // dark-leaf-green on focus
                     inputText: '#333333', // neutral gray for input text
                     inputPlaceholder: '#6B7280', // gray for placeholder text
                     anchorTextColor: '#006400', // dark-leaf-green for links
@@ -78,31 +79,10 @@ const Login = () => {
               },
               style: {
                 button: {
-                  backgroundColor: '#006400', // dark-leaf-green for primary button
-                  color: '#FAFAF5', // ivory for primary button text
-                  borderRadius: '0.5rem',
                   fontWeight: '600',
-                  '&:hover': {
-                    backgroundColor: '#004d00', // Slightly darker green for hover
-                    color: '#FAFAF5',
-                  },
-                },
-                input: {
-                  borderColor: 'hsl(var(--border))',
-                  borderRadius: '0.5rem',
-                  '&:focus': {
-                    borderColor: 'hsl(var(--ring))',
-                    boxShadow: '0 0 0 2px rgba(0, 100, 0, 0.2)', // Green shadow
-                  },
                 },
                 label: {
                   color: 'hsl(var(--foreground))',
-                },
-                anchor: {
-                  color: '#006400', // dark-leaf-green
-                  '&:hover': {
-                    color: '#004d00', // Slightly darker green for hover
-                  },
                 },
               },
             }}
