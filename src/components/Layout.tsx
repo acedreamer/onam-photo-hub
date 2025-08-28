@@ -8,9 +8,9 @@ const Layout = () => {
   const showFab = location.pathname === '/' || location.pathname.startsWith('/profile');
 
   return (
-    <div className="min-h-screen bg-background font-sans flex flex-col">
+    <div className="min-h-screen bg-background font-sans">
       <Header />
-      <main className="flex-grow pb-28 pt-20 px-4 flex flex-col">
+      <main className="pb-28 pt-20 px-4">
         <Outlet />
       </main>
       <BottomNav />

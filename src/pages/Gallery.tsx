@@ -98,7 +98,7 @@ const Gallery = () => {
 
   return (
     <>
-      <div className="space-y-4 flex flex-col flex-grow">
+      <div className="space-y-4">
         <div className="text-center space-y-2">
           <h1 className="text-4xl font-bold text-foreground font-serif">Community Gallery</h1>
           <p className="text-muted-foreground">Explore the vibrant moments of our Onam celebration.</p>
@@ -143,7 +143,7 @@ const Gallery = () => {
             <p className="text-muted-foreground mt-2">Be the first to share a vibrant Onam moment.</p>
           </div>
         ) : (
-          <div className="pt-4 flex-grow">
+          <div style={{ height: 'calc(100vh - 200px)' }} className="pt-4">
             <VirtuosoGrid
               totalCount={photos.length}
               endReached={loadMore}
