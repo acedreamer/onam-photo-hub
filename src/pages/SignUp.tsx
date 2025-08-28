@@ -72,14 +72,12 @@ const SignUp = () => {
                     inputBorderFocus: '#006400', // dark-leaf-green on focus
                     inputText: '#333333', // neutral gray for input text
                     inputPlaceholder: '#6B7280', // gray for placeholder text
-                    text: '#333333', // neutral gray for general text
-                    textAccent: '#006400', // dark-leaf-green for links/accents
-                    textLink: '#006400', // dark-leaf-green for links
-                    textLinkHover: '#004d00', // slightly darker green for link hover
+                    anchorTextColor: '#006400', // dark-leaf-green for links
+                    anchorTextHoverColor: '#004d00', // slightly darker green for link hover
                   },
                   radii: {
                     borderRadiusButton: '0.5rem',
-                    borderRadiusInput: '0.5rem',
+                    inputBorderRadius: '0.5rem',
                   },
                 },
               },

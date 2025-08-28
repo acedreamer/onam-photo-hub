@@ -8,6 +8,7 @@ interface SessionContextValue {
   user: User | null;
   loading: boolean;
   isAdmin: boolean;
+  connectionError: boolean;
 }
 
 const SessionContext = createContext<SessionContextValue>({
@@ -15,6 +16,7 @@ const SessionContext = createContext<SessionContextValue>({
   user: null,
   loading: true,
   isAdmin: false,
+  connectionError: false,
 });
 
 export const SessionProvider = ({ children }: { children: React.ReactNode }) => {
@@ -22,14 +24,25 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [connectionError, setConnectionError] = useState(false);
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      if (loading) {
+        setConnectionError(true);
+        setLoading(false);
+        showError("Connection failed. Please check your network or ad blocker settings.");
+      }
+    }, 7000);
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      clearTimeout(timer);
+
       if (event === 'SIGNED_IN' && session?.user) {
         const userEmail = session.user.email;
         const allowedDomain = 'cekottarakkara.ac.in';
         if (userEmail && !userEmail.endsWith(`@${allowedDomain}`)) {
-          supabase.auth.signOut();
+          await supabase.auth.signOut();
           showError(`Access is restricted to @${allowedDomain} emails.`);
           setSession(null);
           setUser(null);
@@ -59,6 +72,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
 
     return () => {
       subscription.unsubscribe();
+      clearTimeout(timer);
     };
   }, []);
 
@@ -67,11 +81,12 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     user,
     loading,
     isAdmin,
+    connectionError,
   };
 
   return (
     <SessionContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </SessionContext.Provider>
   );
 };

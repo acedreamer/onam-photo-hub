@@ -164,7 +164,7 @@ const ProfilePage = () => {
           profile={profile}
           isOpen={isEditDialogOpen}
           onOpenChange={setIsEditDialogOpen}
-          onProfileUpdate={(updatedProfile) => setProfile(updatedProfile)}
+          onProfileUpdate={() => fetchProfileAndPhotos(0)}
         />
       )}
     </>

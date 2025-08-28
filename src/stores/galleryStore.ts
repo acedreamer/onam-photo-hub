@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type SortByType = 'created_at' | 'likes';
+export type SortByType = 'created_at' | 'likes';
 
 type GalleryFilterState = {
   filterCategory: string;

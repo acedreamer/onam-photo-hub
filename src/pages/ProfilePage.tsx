@@ -18,7 +18,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 
 const PHOTOS_PER_PAGE = 12;
 
-const fetchProfilePhotosPage = async ({ pageParam = 0, userId, currentUserId }: any) => {
+const fetchProfilePhotosPage = async ({ pageParam = 0, userId, currentUserId }: { pageParam: number, userId: string, currentUserId: string }) => {
   const from = pageParam * PHOTOS_PER_PAGE;
   const to = from + PHOTOS_PER_PAGE - 1;
 
@@ -75,8 +75,9 @@ const ProfilePage = () => {
     isFetchingNextPage,
   } = useInfiniteQuery({
       queryKey: ['photos', 'profile', userId],
-      queryFn: ({ pageParam }) => fetchProfilePhotosPage({ pageParam, userId, currentUserId: currentUser!.id }),
+      queryFn: ({ pageParam }) => fetchProfilePhotosPage({ pageParam, userId: userId!, currentUserId: currentUser!.id }),
       getNextPageParam: (lastPage) => lastPage.nextPage,
+      initialPageParam: 0,
       enabled: !!userId && !!currentUser,
   });
 
@@ -119,7 +120,7 @@ const ProfilePage = () => {
 
   const PhotoDetailView = () => {
     if (!selectedPhoto) return null;
-    return <PhotoDetail photo={selectedPhoto} onClose={() => setSelectedPhotoId(null)} />;
+    return <PhotoDetail photo={selectedPhoto as Photo} onClose={() => setSelectedPhotoId(null)} />;
   };
 
   return (
@@ -158,7 +159,7 @@ const ProfilePage = () => {
                     className="cursor-pointer"
                     onClick={() => setSelectedPhotoId(photo.id)}
                   >
-                    <PhotoCard photo={photo} />
+                    <PhotoCard photo={photo as Photo} />
                   </div>
                 );
               }}
