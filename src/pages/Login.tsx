@@ -14,6 +14,8 @@ const Login = () => {
     return <Navigate to="/" replace />;
   }
 
+  // The handleAuthError function is no longer directly used by the Auth component's prop.
+  // Authentication errors are now primarily handled by the onAuthStateChange listener in SessionContext.
   const handleAuthError = (error: Error) => {
     setAuthError(error.message);
     showError(error.message);
@@ -67,7 +69,7 @@ const Login = () => {
                     inputBorderFocus: '#006400', // dark-leaf-green on focus
                     inputText: '#333333', // neutral gray for input text
                     inputPlaceholder: '#6B7280', // gray for placeholder text
-                    anchorText: '#006400', // dark-leaf-green for links
+                    anchorTextColor: '#006400', // dark-leaf-green for links
                     anchorTextHoverColor: '#004d00', // Slightly darker green for link hover
                   },
                   radii: {
@@ -82,19 +84,16 @@ const Login = () => {
                   color: '#FAFAF5', // ivory for primary button text
                   borderRadius: '0.5rem',
                   fontWeight: '600',
-                  // Hover handled by defaultButtonBackgroundHover
                 },
                 input: {
                   borderColor: 'hsl(var(--border))',
                   borderRadius: '0.5rem',
-                  // Focus handled by inputBorderFocus
                 },
                 label: {
                   color: 'hsl(var(--foreground))',
                 },
                 anchor: {
                   color: '#006400', // dark-leaf-green
-                  // Hover handled by anchorTextHoverColor
                 },
               },
             }}
@@ -135,7 +134,7 @@ const Login = () => {
                 },
               },
             }}
-            onError={handleAuthError}
+            // Removed onError prop as it's not supported by the Auth component
           />
           {authError && (
             <p className="text-red-500 text-sm mt-4 text-center">{authError}</p>
