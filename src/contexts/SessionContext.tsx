@@ -71,7 +71,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
 
   return (
     <SessionContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </SessionContext.Provider>
   );
 };
