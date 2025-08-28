@@ -1,5 +1,5 @@
 import type { Photo } from "@/stores/galleryStore";
-import { Badge } => "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, Tag, Heart, Trash2, Download } from "lucide-react";
 import { format } from "date-fns";
