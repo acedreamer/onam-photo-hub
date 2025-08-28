@@ -76,7 +76,7 @@ const Login = () => {
                   },
                 },
               },
-              styles: {
+              style: {
                 button: {
                   backgroundColor: '#006400', // dark-leaf-green for primary button
                   color: '#FAFAF5', // ivory for primary button text
