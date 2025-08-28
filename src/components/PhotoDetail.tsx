@@ -55,8 +55,7 @@ const PhotoDetail = ({ photo, onClose }: PhotoDetailProps) => {
       return imageUrl;
     }
     const parts = imageUrl.split('/upload/');
-    // Corrected: Use 'l_1000000' for limit_bytes to ensure proper URL construction
-    const transformation = 'fl_attachment,w_2000,q_auto,f_auto,fl_force_strip,l_1000000'; 
+    const transformation = 'fl_attachment';
     return `${parts[0]}/upload/${transformation}/${parts[1]}`;
   };
 
