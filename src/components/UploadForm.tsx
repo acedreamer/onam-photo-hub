@@ -18,6 +18,11 @@ interface UploadFormProps {
 
 const uploadCategories = ["Pookalam", "Attire", "Performances", "Sadhya", "Candid"] as const;
 
+// Get Cloudinary credentials from environment variables
+const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
+
 const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
@@ -56,31 +61,44 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
       return;
     }
 
+    if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
+      setError("Cloudinary credentials are not configured. Please check your .env file.");
+      return;
+    }
+
     setIsUploading(true);
     
     try {
       for (const file of files) {
         const formData = new FormData();
         formData.append('file', file);
+        formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET); // Use the unsigned upload preset
 
-        const { data: uploadData, error: functionError } = await supabase.functions.invoke(
-          'cloudinary-upload',
-          { body: formData }
-        );
+        // Direct upload to Cloudinary
+        const response = await fetch(CLOUDINARY_URL, {
+          method: 'POST',
+          body: formData,
+        });
 
-        if (functionError) throw functionError;
-        if (!uploadData.secure_url || !uploadData.public_id) {
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Cloudinary upload failed: ${response.status} ${errorText}`);
+        }
+
+        const cloudinaryData = await response.json();
+        if (!cloudinaryData.secure_url || !cloudinaryData.public_id) {
           throw new Error("Cloudinary upload did not return a valid URL or public ID.");
         }
 
+        // Save the Cloudinary URL and public ID to Supabase
         const { error: insertError } = await supabase
           .from('photos')
           .insert({
             user_id: user.id,
-            image_url: uploadData.secure_url,
+            image_url: cloudinaryData.secure_url,
             caption,
             category,
-            cloudinary_public_id: uploadData.public_id,
+            cloudinary_public_id: cloudinaryData.public_id,
             allow_download: allowDownload,
           });
 
