@@ -36,6 +36,13 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
   const { user } = useSession();
   const queryClient = useQueryClient();
 
+  // --- DEBUGGING LOGS ---
+  useEffect(() => {
+    console.log("VITE_CLOUDINARY_CLOUD_NAME:", CLOUDINARY_CLOUD_NAME);
+    console.log("VITE_CLOUDINARY_UPLOAD_PRESET:", CLOUDINARY_UPLOAD_PRESET);
+  }, []);
+  // --- END DEBUGGING LOGS ---
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setError(null);
     const selectedFiles = event.target.files;
