@@ -11,7 +11,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useQueryClient } from "@tanstack/react-query";
 import { DrawerHeader, DrawerTitle, DrawerDescription } from "@/components/ui/drawer";
-import imageCompression from 'browser-image-compression'; // Import the compression library
 
 interface UploadFormProps {
   onUploadComplete: () => void;
@@ -49,25 +48,6 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
     }
   };
 
-  const compressImage = async (imageFile: File): Promise<File> => {
-    const options = {
-      maxSizeMB: 1,           // (max file size in MB)
-      maxWidthOrHeight: 1920, // (max width or height in pixels)
-      useWebWorker: true,   // (optional) use web worker for faster compression
-      fileType: 'image/webp', // (optional) convert to webp for better compression
-    };
-    try {
-      const compressedFile = await imageCompression(imageFile, options);
-      console.log(`Original file size: ${imageFile.size / 1024 / 1024} MB`);
-      console.log(`Compressed file size: ${compressedFile.size / 1024 / 1024} MB`);
-      return compressedFile;
-    } catch (error) {
-      console.error('Image compression error:', error);
-      showError('Failed to compress image. Uploading original.');
-      return imageFile; // Fallback to original if compression fails
-    }
-  };
-
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError(null);
@@ -80,25 +60,15 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
     
     try {
       for (const file of files) {
-        // Compress image on the client-side before uploading
-        const compressedFile = await compressImage(file);
-
         const formData = new FormData();
-        formData.append('file', compressedFile); // Append the compressed file
+        formData.append('file', file);
 
-        // Invoke the Cloudinary upload Edge Function
         const { data: uploadData, error: functionError } = await supabase.functions.invoke(
           'cloudinary-upload',
           { body: formData }
         );
 
-        if (functionError) {
-          // Provide a more specific error message if credentials are not set in Supabase Secrets
-          if (functionError.message.includes("Cloudinary credentials are not set")) {
-            throw new Error("Cloudinary upload failed: Please ensure CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET are set as Supabase Secrets for the 'cloudinary-upload' Edge Function.");
-          }
-          throw functionError; // Re-throw other function errors
-        }
+        if (functionError) throw functionError;
         if (!uploadData.secure_url || !uploadData.public_id) {
           throw new Error("Cloudinary upload did not return a valid URL or public ID.");
         }

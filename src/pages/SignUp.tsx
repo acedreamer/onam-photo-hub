@@ -1,15 +1,23 @@
+import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Navigate } from 'react-router-dom';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
+import { showError } from '@/utils/toast';
 import { useSession } from '@/contexts/SessionContext';
 
 const SignUp = () => {
   const { session } = useSession();
+  const [authError, setAuthError] = useState<string | null>(null);
 
   if (session) {
     return <Navigate to="/" replace />;
   }
+
+  const handleAuthError = (error: Error) => {
+    setAuthError(error.message);
+    showError(error.message);
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 overflow-hidden relative">
@@ -64,7 +72,7 @@ const SignUp = () => {
                     inputBorderFocus: '#006400', // dark-leaf-green on focus
                     inputText: '#333333', // neutral gray for input text
                     inputPlaceholder: '#6B7280', // gray for placeholder text
-                    anchorTextColor: '#006400', // dark-leaf-green for links
+                    anchorText: '#006400', // dark-leaf-green for links
                     anchorTextHoverColor: '#004d00', // Slightly darker green for link hover
                   },
                   radii: {
@@ -79,16 +87,19 @@ const SignUp = () => {
                   color: '#FAFAF5', // ivory for primary button text
                   borderRadius: '0.5rem',
                   fontWeight: '600',
+                  // Hover handled by defaultButtonBackgroundHover
                 },
                 input: {
                   borderColor: 'hsl(var(--border))',
                   borderRadius: '0.5rem',
+                  // Focus handled by inputBorderFocus
                 },
                 label: {
                   color: 'hsl(var(--foreground))',
                 },
                 anchor: {
                   color: '#006400', // dark-leaf-green
+                  // Hover handled by anchorTextHoverColor
                 },
               },
             }}
@@ -129,8 +140,11 @@ const SignUp = () => {
                 },
               },
             }}
-            // Removed onError prop as it's not supported by the Auth component
+            onError={handleAuthError}
           />
+          {authError && (
+            <p className="text-red-500 text-sm mt-4 text-center">{authError}</p>
+          )}
         </div>
       </div>
     </div>

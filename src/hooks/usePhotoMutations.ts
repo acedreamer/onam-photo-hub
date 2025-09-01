@@ -51,7 +51,7 @@ export const usePhotoMutations = () => {
 
       return { previousPhotos };
     },
-    onError: (_err, _variables, context) => { // Renamed 'err' to '_err'
+    onError: (err, variables, context) => {
       showError('Could not update like.');
       if (context?.previousPhotos) {
         queryClient.setQueriesData({ queryKey: ['photos'] }, context.previousPhotos);
