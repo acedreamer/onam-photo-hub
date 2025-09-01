@@ -16,10 +16,10 @@ const SignUp = () => {
 
   // The handleAuthError function is no longer directly used by the Auth component's prop.
   // Authentication errors are now primarily handled by the onAuthStateChange listener in SessionContext.
-  const handleAuthError = (error: Error) => {
-    setAuthError(error.message);
-    showError(error.message);
-  };
+  // const handleAuthError = (error: Error) => { // Removed unused function
+  //   setAuthError(error.message);
+  //   showError(error.message);
+  // };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 overflow-hidden relative">

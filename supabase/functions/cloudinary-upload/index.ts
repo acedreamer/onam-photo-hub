@@ -23,6 +23,12 @@ serve(async (req) => {
     const apiKey = Deno.env.get("CLOUDINARY_API_KEY");
     const apiSecret = Deno.env.get("CLOUDINARY_API_SECRET");
 
+    // --- DEBUG LOGGING ---
+    console.log("Cloudinary_CLOUD_NAME:", cloudName ? "SET" : "NOT SET");
+    console.log("Cloudinary_API_KEY:", apiKey ? "SET" : "NOT SET");
+    console.log("Cloudinary_API_SECRET:", apiSecret ? "SET" : "NOT SET");
+    // --- END DEBUG LOGGING ---
+
     if (!cloudName || !apiKey || !apiSecret) {
       throw new Error("Cloudinary credentials are not set in environment variables.");
     }

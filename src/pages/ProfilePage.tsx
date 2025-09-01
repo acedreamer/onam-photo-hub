@@ -12,7 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Loader2, Edit } from 'lucide-react';
-import { useInfiniteQuery, useQuery, useQueryClient, InfiniteData } from '@tanstack/react-query'; // Import InfiniteData
+import { useInfiniteQuery, useQuery, useQueryClient, InfiniteData } from '@tanstack/react-query';
 import { VirtuosoGrid } from 'react-virtuoso';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -79,7 +79,7 @@ const ProfilePage = () => {
     isLoading: isLoadingPhotos,
     isFetchingNextPage,
   } = useInfiniteQuery<PhotoPageResult, Error, InfiniteData<PhotoPageResult>, string[], number>({
-      queryKey: ['photos', 'profile', userId],
+      queryKey: ['photos', 'profile', userId!], // Assert userId as string here
       queryFn: ({ pageParam }) => fetchProfilePhotosPage({ pageParam, userId, currentUserId: currentUser!.id }),
       initialPageParam: 0,
       getNextPageParam: (lastPage) => lastPage.nextPage,
@@ -195,7 +195,7 @@ const ProfilePage = () => {
           profile={profile}
           isOpen={isEditDialogOpen}
           onOpenChange={setIsEditDialogOpen}
-          onProfileUpdate={() => { // Changed to no arguments
+          onProfileUpdate={() => {
             refetchProfile();
             queryClient.invalidateQueries({ queryKey: ['photos', 'profile', userId] });
           }}
