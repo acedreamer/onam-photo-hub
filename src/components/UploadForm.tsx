@@ -92,7 +92,13 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
           { body: formData }
         );
 
-        if (functionError) throw functionError;
+        if (functionError) {
+          // Provide a more specific error message if credentials are not set in Supabase Secrets
+          if (functionError.message.includes("Cloudinary credentials are not set")) {
+            throw new Error("Cloudinary upload failed: Please ensure CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET are set as Supabase Secrets for the 'cloudinary-upload' Edge Function.");
+          }
+          throw functionError; // Re-throw other function errors
+        }
         if (!uploadData.secure_url || !uploadData.public_id) {
           throw new Error("Cloudinary upload did not return a valid URL or public ID.");
         }
