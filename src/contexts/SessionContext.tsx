@@ -25,36 +25,47 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        const userEmail = session.user.email;
-        const allowedDomain = 'cekottarakkara.ac.in';
-        if (userEmail && !userEmail.endsWith(`@${allowedDomain}`)) {
-          supabase.auth.signOut();
-          showError(`Access is restricted to @${allowedDomain} emails.`);
-          setSession(null);
-          setUser(null);
-          setIsAdmin(false);
-          setLoading(false);
-          return;
+      try {
+        if (event === 'SIGNED_IN' && session?.user) {
+          const userEmail = session.user.email;
+          const allowedDomain = 'cekottarakkara.ac.in';
+          if (userEmail && !userEmail.endsWith(`@${allowedDomain}`)) {
+            await supabase.auth.signOut(); // Use await here
+            showError(`Access is restricted to @${allowedDomain} emails.`);
+            setSession(null);
+            setUser(null);
+            setIsAdmin(false);
+            return; // Exit early after sign out
+          }
         }
-      }
-      
-      setSession(session);
-      setUser(session?.user ?? null);
-
-      if (session?.user) {
-        const { data } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', session.user.id)
-          .single();
         
-        setIsAdmin(data?.role === 'admin');
-      } else {
-        setIsAdmin(false);
-      }
+        setSession(session);
+        setUser(session?.user ?? null);
 
-      setLoading(false);
+        if (session?.user) {
+          const { data, error } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', session.user.id)
+            .maybeSingle(); // Use maybeSingle() to handle no rows gracefully
+          
+          if (error) {
+            console.error("Error fetching user role:", error);
+            // Optionally show an error, but don't block rendering
+          }
+          setIsAdmin(data?.role === 'admin');
+        } else {
+          setIsAdmin(false);
+        }
+      } catch (error: any) {
+        console.error("Error in onAuthStateChange:", error);
+        showError(error.message || "An unexpected authentication error occurred.");
+        setSession(null);
+        setUser(null);
+        setIsAdmin(false);
+      } finally {
+        setLoading(false); // Always set loading to false
+      }
     });
 
     return () => {
