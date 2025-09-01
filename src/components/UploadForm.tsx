@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useQueryClient } from "@tanstack/react-query";
 import { DrawerHeader, DrawerTitle, DrawerDescription } from "@/components/ui/drawer";
+import imageCompression from 'browser-image-compression'; // Import the compression library
 
 interface UploadFormProps {
   onUploadComplete: () => void;
@@ -18,7 +19,6 @@ interface UploadFormProps {
 
 const uploadCategories = ["Pookalam", "Attire", "Performances", "Sadhya", "Candid"] as const;
 
-// Get Cloudinary credentials from environment variables
 const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
@@ -53,6 +53,25 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
     }
   };
 
+  const compressImage = async (imageFile: File): Promise<File> => {
+    const options = {
+      maxSizeMB: 1,           // (max file size in MB)
+      maxWidthOrHeight: 1920, // (max width or height in pixels)
+      use  WebWorker: true,   // (optional) use web worker for faster compression
+      fileType: 'image/webp', // (optional) convert to webp for better compression
+    };
+    try {
+      const compressedFile = await imageCompression(imageFile, options);
+      console.log(`Original file size: ${imageFile.size / 1024 / 1024} MB`);
+      console.log(`Compressed file size: ${compressedFile.size / 1024 / 1024} MB`);
+      return compressedFile;
+    } catch (error) {
+      console.error('Image compression error:', error);
+      showError('Failed to compress image. Uploading original.');
+      return imageFile; // Fallback to original if compression fails
+    }
+  };
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError(null);
@@ -70,11 +89,13 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
     
     try {
       for (const file of files) {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET); // Use the unsigned upload preset
+        // Compress image on the client-side before uploading
+        const compressedFile = await compressImage(file);
 
-        // Direct upload to Cloudinary
+        const formData = new FormData();
+        formData.append('file', compressedFile); // Upload the compressed file
+        formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
         const response = await fetch(CLOUDINARY_URL, {
           method: 'POST',
           body: formData,
@@ -90,7 +111,6 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
           throw new Error("Cloudinary upload did not return a valid URL or public ID.");
         }
 
-        // Save the Cloudinary URL and public ID to Supabase
         const { error: insertError } = await supabase
           .from('photos')
           .insert({
