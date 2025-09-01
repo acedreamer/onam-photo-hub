@@ -26,16 +26,21 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       try {
+        // Domain restriction check
         if (event === 'SIGNED_IN' && session?.user) {
           const userEmail = session.user.email;
           const allowedDomain = 'cekottarakkara.ac.in';
           if (userEmail && !userEmail.endsWith(`@${allowedDomain}`)) {
-            await supabase.auth.signOut(); // Use await here
+            await supabase.auth.signOut();
             showError(`Access is restricted to @${allowedDomain} emails.`);
             setSession(null);
             setUser(null);
             setIsAdmin(false);
-            return; // Exit early after sign out
+            // Clear hash immediately after sign out due to domain restriction
+            if (window.location.hash.includes('access_token')) {
+              window.history.replaceState({}, document.title, window.location.pathname);
+            }
+            return;
           }
         }
         
@@ -47,16 +52,21 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
             .from('user_roles')
             .select('role')
             .eq('user_id', session.user.id)
-            .maybeSingle(); // Use maybeSingle() to handle no rows gracefully
+            .maybeSingle(); // Using maybeSingle() to gracefully handle no role found
           
           if (error) {
             console.error("Error fetching user role:", error);
-            // Optionally show an error, but don't block rendering
           }
           setIsAdmin(data?.role === 'admin');
         } else {
           setIsAdmin(false);
         }
+
+        // Clear hash after successful session processing (SIGNED_IN or INITIAL_SESSION)
+        if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && window.location.hash.includes('access_token')) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
       } catch (error: any) {
         console.error("Error in onAuthStateChange:", error);
         showError(error.message || "An unexpected authentication error occurred.");
@@ -64,14 +74,14 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         setUser(null);
         setIsAdmin(false);
       } finally {
-        setLoading(false); // Always set loading to false
+        setLoading(false);
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, []); // Empty dependency array means this runs once on mount
 
   const value = {
     session,
@@ -82,7 +92,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
 
   return (
     <SessionContext.Provider value={value}>
-      {!loading && children}
+      {children} {/* Always render children, ProtectedRoute handles loading */}
     </SessionContext.Provider>
   );
 };
