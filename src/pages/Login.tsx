@@ -1,25 +1,15 @@
-import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSession } from '@/contexts/SessionContext';
 import { Navigate } from 'react-router-dom';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
-import { showError } from '@/utils/toast';
 
 const Login = () => {
   const { session } = useSession();
-  const [authError, setAuthError] = useState<string | null>(null);
 
   if (session) {
     return <Navigate to="/" replace />;
   }
-
-  // The handleAuthError function is no longer directly used by the Auth component's prop.
-  // Authentication errors are now primarily handled by the onAuthStateChange listener in SessionContext.
-  // const handleAuthError = (error: Error) => { // Removed unused function
-  //   setAuthError(error.message);
-  //   showError(error.message);
-  // };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 overflow-hidden relative">
@@ -136,9 +126,6 @@ const Login = () => {
             }}
             // Removed onError prop as it's not supported by the Auth component
           />
-          {authError && (
-            <p className="text-red-500 text-sm mt-4 text-center">{authError}</p>
-          )}
           <p className="text-xs text-muted-foreground mt-4 text-center">
             Only @cekottarakkara.ac.in emails are allowed
           </p>
