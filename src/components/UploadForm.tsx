@@ -40,6 +40,7 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
   useEffect(() => {
     console.log("VITE_CLOUDINARY_CLOUD_NAME:", CLOUDINARY_CLOUD_NAME);
     console.log("VITE_CLOUDINARY_UPLOAD_PRESET:", CLOUDINARY_UPLOAD_PRESET);
+    // This comment is added to force a rebuild on Vercel.
   }, []);
   // --- END DEBUGGING LOGS ---
 
