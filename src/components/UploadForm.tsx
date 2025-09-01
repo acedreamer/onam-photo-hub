@@ -57,7 +57,7 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
     const options = {
       maxSizeMB: 1,           // (max file size in MB)
       maxWidthOrHeight: 1920, // (max width or height in pixels)
-      use  WebWorker: true,   // (optional) use web worker for faster compression
+      useWebWorker: true,   // (optional) use web worker for faster compression
       fileType: 'image/webp', // (optional) convert to webp for better compression
     };
     try {
