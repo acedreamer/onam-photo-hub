@@ -19,11 +19,6 @@ interface UploadFormProps {
 
 const uploadCategories = ["Pookalam", "Attire", "Performances", "Sadhya", "Candid"] as const;
 
-// Ensure these lines are exactly as shown, using import.meta.env.VITE_
-const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
-const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
-
 const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
@@ -35,14 +30,6 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { user } = useSession();
   const queryClient = useQueryClient();
-
-  // --- DEBUGGING LOGS ---
-  useEffect(() => {
-    console.log("VITE_CLOUDINARY_CLOUD_NAME:", CLOUDINARY_CLOUD_NAME);
-    console.log("VITE_CLOUDINARY_UPLOAD_PRESET:", CLOUDINARY_UPLOAD_PRESET);
-    // This comment is added to force a rebuild on Vercel.
-  }, []);
-  // --- END DEBUGGING LOGS ---
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setError(null);
@@ -89,12 +76,6 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
       return;
     }
 
-    // This is where the check happens
-    if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
-      setError("Cloudinary credentials are not configured. Please check your .env file.");
-      return;
-    }
-
     setIsUploading(true);
     
     try {
@@ -103,21 +84,16 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
         const compressedFile = await compressImage(file);
 
         const formData = new FormData();
-        formData.append('file', compressedFile); // Upload the compressed file
-        formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+        formData.append('file', compressedFile); // Append the compressed file
 
-        const response = await fetch(CLOUDINARY_URL, {
-          method: 'POST',
-          body: formData,
-        });
+        // Invoke the Cloudinary upload Edge Function
+        const { data: uploadData, error: functionError } = await supabase.functions.invoke(
+          'cloudinary-upload',
+          { body: formData }
+        );
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`Cloudinary upload failed: ${response.status} ${errorText}`);
-        }
-
-        const cloudinaryData = await response.json();
-        if (!cloudinaryData.secure_url || !cloudinaryData.public_id) {
+        if (functionError) throw functionError;
+        if (!uploadData.secure_url || !uploadData.public_id) {
           throw new Error("Cloudinary upload did not return a valid URL or public ID.");
         }
 
@@ -125,10 +101,10 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
           .from('photos')
           .insert({
             user_id: user.id,
-            image_url: cloudinaryData.secure_url,
+            image_url: uploadData.secure_url,
             caption,
             category,
-            cloudinary_public_id: cloudinaryData.public_id,
+            cloudinary_public_id: uploadData.public_id,
             allow_download: allowDownload,
           });
 
