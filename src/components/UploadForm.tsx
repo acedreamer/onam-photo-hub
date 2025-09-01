@@ -19,6 +19,7 @@ interface UploadFormProps {
 
 const uploadCategories = ["Pookalam", "Attire", "Performances", "Sadhya", "Candid"] as const;
 
+// Ensure these lines are exactly as shown, using import.meta.env.VITE_
 const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
@@ -80,6 +81,7 @@ const UploadForm = ({ onUploadComplete }: UploadFormProps) => {
       return;
     }
 
+    // This is where the check happens
     if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
       setError("Cloudinary credentials are not configured. Please check your .env file.");
       return;
