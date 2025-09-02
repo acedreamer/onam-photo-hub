@@ -1,7 +1,4 @@
 {
-  // This file configures TypeScript for the Deno environment used by Supabase Edge Functions.
-  // It tells your code editor how to correctly interpret Deno-specific code,
-  // resolving errors like "Cannot find name 'Deno'" and module import issues.
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",

@@ -1,5 +1,5 @@
-import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import { createHash } from "https://deno.land/std@0.177.0/node/crypto.ts";
+import { serve } from "https://deno.land/std@0.208.0/http/server.ts";
+import { createHash } from "https://deno.land/std@0.208.0/node/crypto.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
