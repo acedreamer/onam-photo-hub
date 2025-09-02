@@ -1,6 +1,6 @@
-import { serve } from "https://deno.land/std@0.225.2/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
-import { createHash } from "https://deno.land/std@0.225.2/node/crypto.ts";
+import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.8';
+import { createHash } from "https://deno.land/std@0.177.0/node/crypto.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
