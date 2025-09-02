@@ -30,12 +30,13 @@ serve(async (req) => {
     const timestamp = Math.round(new Date().getTime() / 1000);
     const folder = 'onam-photo-hub';
 
-    // Use Web Crypto API for SHA-1 hashing
+    // Generate signature using Web Crypto API
     const paramsToSign = `folder=${folder}&timestamp=${timestamp}${apiSecret}`;
-    const dataToSign = new TextEncoder().encode(paramsToSign);
-    const hashBuffer = await crypto.subtle.digest('SHA-1', dataToSign);
+    const encoder = new TextEncoder();
+    const encodedData = encoder.encode(paramsToSign);
+    const hashBuffer = await crypto.subtle.digest('SHA-1', encodedData);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const signature = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+    const signature = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
     const uploadFormData = new FormData();
     uploadFormData.append('file', file);
@@ -56,12 +57,12 @@ serve(async (req) => {
       throw new Error(`Cloudinary upload failed: ${response.status} ${errorText}`);
     }
 
-    const data = await response.json();
+    const responseData: any = await response.json();
 
     return new Response(
       JSON.stringify({ 
-        secure_url: data.secure_url,
-        public_id: data.public_id,
+        secure_url: responseData.secure_url,
+        public_id: responseData.public_id,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

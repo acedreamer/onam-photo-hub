@@ -47,12 +47,13 @@ serve(async (req) => {
 
     const timestamp = Math.round(new Date().getTime() / 1000);
     
-    // Use Web Crypto API for SHA-1 hashing
+    // Generate signature using Web Crypto API
     const paramsToSign = `public_id=${public_id}&timestamp=${timestamp}${apiSecret}`;
-    const dataToSign = new TextEncoder().encode(paramsToSign);
-    const hashBuffer = await crypto.subtle.digest('SHA-1', dataToSign);
+    const encoder = new TextEncoder();
+    const encodedData = encoder.encode(paramsToSign);
+    const hashBuffer = await crypto.subtle.digest('SHA-1', encodedData);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const signature = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+    const signature = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
     const deleteFormData = new FormData();
     deleteFormData.append('public_id', public_id);
@@ -71,13 +72,13 @@ serve(async (req) => {
       throw new Error(`Cloudinary deletion failed: ${response.status} ${errorText}`);
     }
 
-    const data = await response.json();
+    const responseData: any = await response.json();
 
-    if (data.result !== 'ok' && data.result !== 'not found') {
-        throw new Error(`Cloudinary deletion failed with result: ${data.result}`);
+    if (responseData.result !== 'ok' && responseData.result !== 'not found') {
+        throw new Error(`Cloudinary deletion failed with result: ${responseData.result}`);
     }
 
-    return new Response(JSON.stringify({ success: true, result: data.result }), {
+    return new Response(JSON.stringify({ success: true, result: responseData.result }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     });
