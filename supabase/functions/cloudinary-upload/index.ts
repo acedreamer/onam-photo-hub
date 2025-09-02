@@ -47,7 +47,7 @@ serve(async (req) => {
     uploadFormData.append('timestamp', timestamp.toString());
     uploadFormData.append('signature', signature);
     uploadFormData.append('folder', folder);
-    uploadFormData.append('quality', 'auto:good');
+    // Removed: uploadFormData.append('quality', 'auto:good');
 
     const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
       method: 'POST',
