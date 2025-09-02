@@ -41,6 +41,10 @@ serve(async (req) => {
     const apiKey = Deno.env.get("CLOUDINARY_API_KEY");
     const apiSecret = Deno.env.get("CLOUDINARY_API_SECRET");
 
+    console.log(`CLOUDINARY_CLOUD_NAME: ${cloudName ? 'Set' : 'Not Set'}`);
+    console.log(`CLOUDINARY_API_KEY: ${apiKey ? 'Set' : 'Not Set'}`);
+    console.log(`CLOUDINARY_API_SECRET: ${apiSecret ? 'Set (masked)' : 'Not Set'}`);
+
     if (!cloudName || !apiKey || !apiSecret) {
       throw new Error("Cloudinary credentials are not set.");
     }
@@ -49,7 +53,7 @@ serve(async (req) => {
     
     // Use Web Crypto API for SHA-1 hashing
     const paramsToSign = `public_id=${public_id}&timestamp=${timestamp}${apiSecret}`;
-    const dataToSign = new TextEncoder().encode(paramsToSign); // Renamed variable here
+    const dataToSign = new TextEncoder().encode(paramsToSign);
     const hashBuffer = await crypto.subtle.digest('SHA-1', dataToSign);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const signature = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
@@ -71,7 +75,7 @@ serve(async (req) => {
       throw new Error(`Cloudinary deletion failed: ${response.status} ${errorText}`);
     }
 
-    const responseData: any = await response.json(); // Original variable name for response data
+    const responseData: any = await response.json();
 
     if (responseData.result !== 'ok' && responseData.result !== 'not found') {
         throw new Error(`Cloudinary deletion failed with result: ${responseData.result}`);
