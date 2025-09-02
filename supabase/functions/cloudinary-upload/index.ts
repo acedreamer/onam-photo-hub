@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.208.0/http/server.ts";
-import { createHash } from "https://deno.land/std@0.208.0/node/crypto.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -24,9 +23,6 @@ serve(async (req) => {
     const apiKey = Deno.env.get("CLOUDINARY_API_KEY");
     const apiSecret = Deno.env.get("CLOUDINARY_API_SECRET");
 
-    console.log(`Cloud Name found: ${!!cloudName}`);
-    console.log(`API Key found: ${!!apiKey}`);
-
     if (!cloudName || !apiKey || !apiSecret) {
       throw new Error("Cloudinary credentials are not set in environment variables.");
     }
@@ -34,8 +30,12 @@ serve(async (req) => {
     const timestamp = Math.round(new Date().getTime() / 1000);
     const folder = 'onam-photo-hub';
 
+    // Use Web Crypto API for SHA-1 hashing
     const paramsToSign = `folder=${folder}&timestamp=${timestamp}${apiSecret}`;
-    const signature = createHash('sha1').update(paramsToSign).digest('hex');
+    const dataToSign = new TextEncoder().encode(paramsToSign);
+    const hashBuffer = await crypto.subtle.digest('SHA-1', dataToSign);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const signature = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 
     const uploadFormData = new FormData();
     uploadFormData.append('file', file);

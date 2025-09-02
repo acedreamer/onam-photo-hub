@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.208.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
-import { createHash } from "https://deno.land/std@0.208.0/node/crypto.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -42,16 +41,18 @@ serve(async (req) => {
     const apiKey = Deno.env.get("CLOUDINARY_API_KEY");
     const apiSecret = Deno.env.get("CLOUDINARY_API_SECRET");
 
-    console.log(`Cloud Name found for delete: ${!!cloudName}`);
-    console.log(`API Key found for delete: ${!!apiKey}`);
-
     if (!cloudName || !apiKey || !apiSecret) {
       throw new Error("Cloudinary credentials are not set.");
     }
 
     const timestamp = Math.round(new Date().getTime() / 1000);
+    
+    // Use Web Crypto API for SHA-1 hashing
     const paramsToSign = `public_id=${public_id}&timestamp=${timestamp}${apiSecret}`;
-    const signature = createHash('sha1').update(paramsToSign).digest('hex');
+    const dataToSign = new TextEncoder().encode(paramsToSign);
+    const hashBuffer = await crypto.subtle.digest('SHA-1', dataToSign);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const signature = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 
     const deleteFormData = new FormData();
     deleteFormData.append('public_id', public_id);
