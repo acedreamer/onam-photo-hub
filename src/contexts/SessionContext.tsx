@@ -28,6 +28,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
       if (event === 'SIGNED_IN' && session?.user) {
         const userEmail = session.user.email;
         const allowedDomain = 'cekottarakkara.ac.in';
+        // This is the critical part: if the email doesn't match the domain, it signs out immediately.
         if (userEmail && !userEmail.endsWith(`@${allowedDomain}`)) {
           supabase.auth.signOut();
           showError(`Access is restricted to @${allowedDomain} emails.`);
