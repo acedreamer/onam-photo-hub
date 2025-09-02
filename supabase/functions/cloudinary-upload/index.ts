@@ -1,5 +1,5 @@
-import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import { createHash } from "https://deno.land/std@0.177.0/node/crypto.ts";
+import { serve } from "https://deno.land/std@0.225.2/http/server.ts";
+import { createHash } from "https://deno.land/std@0.225.2/node/crypto.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,6 +12,7 @@ serve(async (req) => {
   }
 
   try {
+    console.log("Cloudinary upload function invoked.");
     const formData = await req.formData();
     const file = formData.get('file') as File;
 
@@ -22,6 +23,9 @@ serve(async (req) => {
     const cloudName = Deno.env.get("CLOUDINARY_CLOUD_NAME");
     const apiKey = Deno.env.get("CLOUDINARY_API_KEY");
     const apiSecret = Deno.env.get("CLOUDINARY_API_SECRET");
+
+    console.log(`Cloud Name found: ${!!cloudName}`);
+    console.log(`API Key found: ${!!apiKey}`);
 
     if (!cloudName || !apiKey || !apiSecret) {
       throw new Error("Cloudinary credentials are not set in environment variables.");
@@ -48,6 +52,7 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
+      console.error("Cloudinary API error:", errorText);
       throw new Error(`Cloudinary upload failed: ${response.status} ${errorText}`);
     }
 
@@ -64,6 +69,7 @@ serve(async (req) => {
       }
     );
   } catch (error) {
+    console.error("Error in Cloudinary upload function:", error.message);
     return new Response(
       JSON.stringify({ error: error.message }),
       {

@@ -1,6 +1,6 @@
-import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { createHash } from "https://deno.land/std@0.177.0/node/crypto.ts";
+import { serve } from "https://deno.land/std@0.225.2/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+import { createHash } from "https://deno.land/std@0.225.2/node/crypto.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,6 +13,7 @@ serve(async (req) => {
   }
 
   try {
+    console.log("Cloudinary delete function invoked.");
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
@@ -41,6 +42,9 @@ serve(async (req) => {
     const apiKey = Deno.env.get("CLOUDINARY_API_KEY");
     const apiSecret = Deno.env.get("CLOUDINARY_API_SECRET");
 
+    console.log(`Cloud Name found for delete: ${!!cloudName}`);
+    console.log(`API Key found for delete: ${!!apiKey}`);
+
     if (!cloudName || !apiKey || !apiSecret) {
       throw new Error("Cloudinary credentials are not set.");
     }
@@ -62,6 +66,7 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
+      console.error("Cloudinary delete API error:", errorText);
       throw new Error(`Cloudinary deletion failed: ${response.status} ${errorText}`);
     }
 
@@ -77,6 +82,7 @@ serve(async (req) => {
     });
 
   } catch (error) {
+    console.error("Error in Cloudinary delete function:", error.message);
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,
